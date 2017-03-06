@@ -31,7 +31,7 @@ public class LabAnalyzer {
 		analyzeField.get(0).add(new LabItem());
 	}
 	
-	public static void StartAnalyze(){
+	public static void Analyzing(){
 		
 	}
 	
