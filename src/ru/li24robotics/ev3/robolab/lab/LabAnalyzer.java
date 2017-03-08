@@ -101,6 +101,8 @@ public class LabAnalyzer {
 		ArrayList<int[]> potentialCorOnMainField = new ArrayList<int[]>();
 		potentialCorOnMainField.addAll(getRobotCoordinatesNotRotatedAnalyzer(field));
 		potentialCorOnMainField.addAll(getRobotCoordinatesRightRotatedAnalyzer((field)));
+		potentialCorOnMainField.addAll(getRobotCoordinatesOverRotatedAnalyzer(field));
+		potentialCorOnMainField.addAll(getRobotCoordinatesLeftRotatedAnalyzer(field));
 
 		return potentialCorOnMainField;
 	}
@@ -149,27 +151,49 @@ public class LabAnalyzer {
 		return true;
 	}
 
-	//TODO realize getRobotCoordinatesOverRotatedAnalyzer
 	private static ArrayList<int[]> getRobotCoordinatesOverRotatedAnalyzer(ArrayList<ArrayList<LabItem>> field){
 		ArrayList<int[]> potentialCor = new ArrayList<int []>();
-
+		for(int j = 0; j <= field.get(0).size() - analyzeField.get(0).size(); j++){
+			for(int i = 0; i <= field.size() - analyzeField.size(); i ++){
+				if (equalsPartsOfFieldsOverRotated(field, i, j)) {
+					potentialCor.add(new int[] {i + (analyzeField.size() - corNow[0] - 1), j + (analyzeField.get(0).size() - corNow[1])});
+				}
+			}
+		}
 		return potentialCor;
 	}
-	//TODO realize equalsPartsOfFieldsRotated
 	private static boolean equalsPartsOfFieldsOverRotated(ArrayList<ArrayList<LabItem>> field, int x, int y){
-
+		for(int i = 0; i < analyzeField.size(); i ++){
+			for(int j = 0; j < analyzeField.get(0).size(); j ++){
+				if(!analyzeField.get(i).get(j).equals(field.get(x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))){
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 
-	//TODO realize getRobotCoordinatesLeftRotated
 	private static ArrayList<int[]> getRobotCoordinatesLeftRotatedAnalyzer(ArrayList<ArrayList<LabItem>> field){
 		ArrayList<int[]> potentialCor = new ArrayList<int[]>();
 
+		for(int j = 0; j <= field.get(0).size() - analyzeField.size(); j++){
+			for(int i = 0; i <= field.size() - analyzeField.get(0).size(); i++){
+				if(equalsPartsOfFieldsLeftRotated(field, i, j)){
+					potentialCor.add(new int[] {i + (analyzeField.get(0).size() - corNow[1] - 1), j + corNow[0]});
+				}
+			}
+		}
+
 		return potentialCor;
 	}
-	//TODO realize equalsPartsOfFieldsLeftRotated
 	private static boolean equalsPartsOfFieldsLeftRotated(ArrayList<ArrayList<LabItem>> field, int x, int y){
-
+		for(int i = 0; i < analyzeField.size(); i ++){
+			for(int j = 0; j < analyzeField.get(0).size(); j++){
+				if(!analyzeField.get(i).get(j).equals(field.get(x + analyzeField.get(0).size() - j - 1).get(y + i))){
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 
