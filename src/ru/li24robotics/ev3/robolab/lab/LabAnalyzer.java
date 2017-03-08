@@ -104,6 +104,14 @@ public class LabAnalyzer {
 		potentialCorOnMainField.addAll(getRobotCoordinatesOverRotatedAnalyzer(field));
 		potentialCorOnMainField.addAll(getRobotCoordinatesLeftRotatedAnalyzer(field));
 
+		for(int i = 0; i < potentialCorOnMainField.size(); i ++){
+			for(int j = 0; j < potentialCorOnMainField.size(); j++){
+				if(potentialCorOnMainField.get(i)[0] == potentialCorOnMainField.get(j)[0] && potentialCorOnMainField.get(i)[1] == potentialCorOnMainField.get(j)[1] &&i != j){
+					potentialCorOnMainField.remove(j);
+				}
+			}
+		}
+
 		return potentialCorOnMainField;
 	}
 
@@ -121,7 +129,7 @@ public class LabAnalyzer {
 	private static boolean equalsPartsOfFieldsNotRotated (ArrayList<ArrayList<LabItem>> field, int x, int y){
 		for(int i = 0; i < analyzeField.size(); i ++){
 			for(int j = 0; j < analyzeField.get(i).size(); j++){
-				if(!analyzeField.get(i).get(j).equals(field.get(i + x).get(j + y))){
+				if(!analyzeField.get(i).get(j).equalsNotRotate(field.get(i + x).get(j + y))){
 					return false;
 				}
 			}
@@ -143,7 +151,7 @@ public class LabAnalyzer {
 	private static boolean equalsPartsOfFieldsRightRotated(ArrayList<ArrayList<LabItem>> field, int x, int y){
 		for(int i = 0; i < analyzeField.size(); i ++){
 			for (int j = 0; j < analyzeField.get(0).size(); j++){
-				if (!analyzeField.get(i).get(j).equals(field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
+				if (!analyzeField.get(i).get(j).equalsRightRotate(field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
 					return false;
 				}
 			}
@@ -165,7 +173,7 @@ public class LabAnalyzer {
 	private static boolean equalsPartsOfFieldsOverRotated(ArrayList<ArrayList<LabItem>> field, int x, int y){
 		for(int i = 0; i < analyzeField.size(); i ++){
 			for(int j = 0; j < analyzeField.get(0).size(); j ++){
-				if(!analyzeField.get(i).get(j).equals(field.get(x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))){
+				if(!analyzeField.get(i).get(j).equalsOverRotated(field.get(x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))){
 					return false;
 				}
 			}
@@ -189,7 +197,7 @@ public class LabAnalyzer {
 	private static boolean equalsPartsOfFieldsLeftRotated(ArrayList<ArrayList<LabItem>> field, int x, int y){
 		for(int i = 0; i < analyzeField.size(); i ++){
 			for(int j = 0; j < analyzeField.get(0).size(); j++){
-				if(!analyzeField.get(i).get(j).equals(field.get(x + analyzeField.get(0).size() - j - 1).get(y + i))){
+				if(!analyzeField.get(i).get(j).equalsLeftRotated(field.get(x + analyzeField.get(0).size() - j - 1).get(y + i))){
 					return false;
 				}
 			}

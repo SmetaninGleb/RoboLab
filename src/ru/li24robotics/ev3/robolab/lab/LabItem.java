@@ -18,9 +18,8 @@ public class LabItem {
         this.toForward = true;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        LabItem item = (LabItem) obj;
+
+    public boolean equalsNotRotate(LabItem item) {
         if (item != null) {
             if (this.isCubeHere == item.isCubeHere
                     && this.toBack == item.toBack
@@ -32,6 +31,54 @@ public class LabItem {
                 return false;
             }
         } else {
+            return true;
+        }
+    }
+
+    public boolean equalsRightRotate(LabItem item){
+        if(item != null){
+            if(this.isCubeHere == item.isCubeHere
+                    && this.toForward == item.toRight
+                    && this.toRight == item.toBack
+                    && this.toBack == item.toLeft
+                    && this.toLeft == item.toForward){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+    }
+
+    public boolean equalsOverRotated(LabItem item){
+        if(item != null){
+            if(this.isCubeHere == item.isCubeHere
+                    && this.toForward == item.toBack
+                    && this.toRight == item.toLeft
+                    && this.toBack == item.toForward
+                    && this.toLeft == item.toRight){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+    }
+
+    public boolean equalsLeftRotated(LabItem item) {
+        if(item != null){
+            if(this.isCubeHere == item.isCubeHere
+                    && this.toForward == item.toLeft
+                    && this.toRight == item.toForward
+                    && this.toBack == item.toRight
+                    && this.toLeft == item.toBack){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
             return true;
         }
     }
