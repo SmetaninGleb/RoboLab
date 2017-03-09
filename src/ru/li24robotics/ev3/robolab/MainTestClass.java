@@ -11,8 +11,12 @@ public class MainTestClass {
 	
 	public static void main(String args[]){
 		LabItem startItem = new LabItem("0");
-		startItem.toForward = false;
+		startItem.toLeft = false;
 		LabAnalyzer.InitLabAnalyzer(startItem);
+		LabItem startItem2 = new LabItem("0");
+		startItem2.toBack = false;
+		LabAnalyzer.addItemToRight(startItem2);
+
 
 		ArrayList<ArrayList<LabItem>> field = new ArrayList<>();
 		for(int i = 0; i < 8; i ++){
@@ -21,9 +25,12 @@ public class MainTestClass {
 				field.get(i).add(j, new LabItem("1"));
 			}
 		}
-		field.get(2).get(3).toForward = false;
-		field.get(4).get(1).toLeft = false;
+		field.get(1).get(2).toLeft = false;
+		field.get(2).get(2).toBack = false;
+		field.get(6).get(2).toForward = false;
+		field.get(6).get(1).toLeft = false;
 		field.get(4).get(1).toBack = false;
+		field.get(4).get(2).toLeft = false;
 
 		ArrayList<int[]> potentialCors = LabAnalyzer.getRobotCoordinatesOnMainLab(field);
 
