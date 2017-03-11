@@ -3,11 +3,28 @@ package ru.li24robotics.ev3.robolab.lab;
 
 import java.util.ArrayList;
 
+/**
+ * Класс анализирует лабиринт, который видит робот, и хранит
+ * его в статичном поле.
+ *
+ *
+ * @author Smetanin Gleb
+ */
 
 public class LabAnalyzer {
+    /**
+     * Поле {@code analyzeField} хранит лабиринт, который проанализировал робот
+     * Поле {@code corNow} хранит координаты анализированного лабиринта, в которых стоит робот(corNow[0] - x, corNow[1] - y)
+     */
 	private static ArrayList<ArrayList<LabItem>> analyzeField;
 	private static int [] corNow = {0, 0};
-	
+
+    /**
+     * Инициализирует класс анализатора, создает {@code analyzeField}, получает на вход первый {@link LabItem}
+     *
+     * @see ru.li24robotics.ev3.robolab.lab.LabItem
+     * @param startItem
+     */
 	public static void InitLabAnalyzer(LabItem startItem){
 
 		
@@ -15,8 +32,12 @@ public class LabAnalyzer {
 		analyzeField.add(new ArrayList<LabItem>());
 		analyzeField.get(0).add(startItem);
 	}
-	
-	//about moving robot in field
+
+    /**
+     * Методы {@code putRobotToBack}, {@code putRobotToForward},
+     * {@code putRobotToRight}, {@code putRobotToLeft} перемещает робота в анализируемом поле {@code analyzeField},
+     * меняет координаты {@code corNow} робота в нем
+     */
 	public static void putRobotToForwad(){
 		corNow[1] ++;
 	}
@@ -32,8 +53,16 @@ public class LabAnalyzer {
 	public static void putRobotToLeft(){
 		corNow[0] --;
 	}
-	
-	//about building field
+
+
+    /**
+     * Методы {@code addItemToBack}, {@code addItemToRight},
+     * {@code addItemToForward}, {@code addItemToLeft} добавляет {@link LabItem} в {@code analyzeField}
+     *
+     * @see ru.li24robotics.ev3.robolab.lab.LabItem
+     * @param item
+     */
+
 	public static void addItemToRight(LabItem item){
 		if(corNow[0] == analyzeField.size() - 1){
 			analyzeField.add(corNow[0] + 1, new ArrayList<LabItem>());
@@ -96,7 +125,13 @@ public class LabAnalyzer {
 		}
 	}
 
-	//for get Robot's coordinates on another fields
+    /**
+     * Метод {@code getRobotCoordinatesOnMainLab} принимает на вход полный либаринт
+     * и возвращает массив возможных координат нахождений робота
+     *
+     * @param field
+     * @return массив координат, где модет находиться робот
+     */
 	public static ArrayList<int[]> getRobotCoordinatesOnMainLab(ArrayList<ArrayList<LabItem>> field){
 		ArrayList<int[]> potentialCorOnMainField = new ArrayList<int[]>();
 		potentialCorOnMainField.addAll(getRobotCoordinatesNotRotatedAnalyzer(field));
@@ -115,6 +150,18 @@ public class LabAnalyzer {
 		return potentialCorOnMainField;
 	}
 
+    /**
+     * Методы {@code getRobotCoordinatesNotRotatedAnalyzer}, {@code getRobotCoordinatesLeftRotatedAnalyzer},
+     * {@code getRobotCoordinatesRightRotatedAnalyzer}, {@code getRobotCoordinatesOverRotatedAnalyzer}
+     * ищут возможные кординаты робота главном лабиринте, учитывают возможные положения робота
+     * в главном лабиринте и вызывают методы{@code equalsNotRotate},
+     * {@code equalsRightRotate}, {@code equalsOverRotated}, {@code equalsLeftRotated} которые сравнивают
+     * просканированный лабиринт с главным в различный направлениях соответственно
+     *
+     *
+     * @param field
+     * @return
+     */
 	private static ArrayList<int[]> getRobotCoordinatesNotRotatedAnalyzer(ArrayList<ArrayList<LabItem>> field){
 		ArrayList<int[]> potentialCor = new ArrayList<int[]>();
 		for(int j = 0; j <= field.get(0).size() - analyzeField.get(0).size(); j++){
@@ -205,7 +252,10 @@ public class LabAnalyzer {
 		return true;
 	}
 
-	//for debug
+    /**
+     * Метод {@code outField} выводит просканируемый лабиринт
+     */
+
 	public static void outField(){
 		for(int j = analyzeField.get(0).size() - 1; j >= 0; j --){
 			for(int i = 0; i < analyzeField.size(); i ++){
@@ -223,7 +273,11 @@ public class LabAnalyzer {
 		}
 	}
 
-	//getters and setters
+    /**
+     * Getters and Setters просканированного поля и координат в нем робота
+     *
+     * @return
+     */
 	public static ArrayList<ArrayList<LabItem>> getAnalyzeField() {
 		return analyzeField;
 	}
