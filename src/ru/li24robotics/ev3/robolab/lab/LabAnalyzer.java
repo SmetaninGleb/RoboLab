@@ -40,18 +40,30 @@ public class LabAnalyzer {
      */
 	public static void putRobotToForwad(){
 		corNow[1] ++;
+		if(analyzeField.get(0).size() == corNow[1]){
+			addItemToForward(new LabItem("2"));
+		}
 	}
 	
 	public static void putRobotToBack(){
-		corNow[1] --;	
+		corNow[1] --;
+		if(corNow[1] < 0){
+			addItemToBack(new LabItem("2"));
+		}
 	}
 	
 	public static void putRobotToRight(){
 		corNow[0] ++;
+		if(corNow[0] == analyzeField.size()){
+			addItemToRight(new LabItem("2"));
+		}
 	}
 	
 	public static void putRobotToLeft(){
 		corNow[0] --;
+		if(corNow[0] < 0){
+			addItemToLeft(new LabItem("2"));
+		}
 	}
 
 
