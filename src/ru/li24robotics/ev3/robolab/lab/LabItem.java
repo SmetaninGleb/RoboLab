@@ -1,6 +1,20 @@
 package ru.li24robotics.ev3.robolab.lab;
 
+
+/**
+ * Класс описывает ячейку либаринта, состоящую из четырех сторон, где могут
+ * быть стены
+ *
+ * @see ru.li24robotics.ev3.robolab.lab.LabWall
+ * @author Smetanin Gleb
+ */
 public class LabItem {
+    /**
+     * Поля хранят четыре стены соответственно и ключ, нужный для отслеживания
+     * работы алгоритма
+     *
+     * @see ru.li24robotics.ev3.robolab.lab.LabWall
+     */
     public LabWall toRight;
     public LabWall toBack;
     public LabWall toLeft;
@@ -10,6 +24,10 @@ public class LabItem {
     //TODO delete key
     private String key;
 
+    /**
+     * Конструктор принимает ключ и создает стены
+     * @param key
+     */
     public LabItem(String key) {
         this.key = key;
         this.toBack = new LabWall();
@@ -19,6 +37,12 @@ public class LabItem {
     }
 
 
+    /**
+     * Четыре метода equals сравнивают с поправкой на возможные повороты робота
+     * в главном лабиринте. (Да, некрасивая реализация, но таков мой красивый алгоритм!)
+     * @param item
+     * @return
+     */
     public boolean equalsNotRotate(LabItem item) {
         if(this.isCubeHere != item.isCubeHere){
         	return false;
@@ -75,6 +99,10 @@ public class LabItem {
         }
     }
 
+    /**
+     * toString реализован для вывода сканируемого лабиринта
+     * @return
+     */
     @Override
     public String toString() {
         return key;

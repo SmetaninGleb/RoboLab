@@ -23,7 +23,6 @@ public class LabAnalyzer {
      * Инициализирует класс анализатора, создает {@code analyzeField}, получает на вход первый {@link LabItem}
      *
      * @see ru.li24robotics.ev3.robolab.lab.LabItem
-     * @param startItem
      */
 	public static void InitLabAnalyzer(LabItem startItem){
 
@@ -72,7 +71,6 @@ public class LabAnalyzer {
      * {@code addItemToForward}, {@code addItemToLeft} добавляет {@link LabItem} в {@code analyzeField}
      *
      * @see ru.li24robotics.ev3.robolab.lab.LabItem
-     * @param item
      */
 
 	public static void addItemToRight(LabItem item){
@@ -141,7 +139,6 @@ public class LabAnalyzer {
      * Метод {@code getRobotCoordinatesOnMainLab} принимает на вход полный либаринт
      * и возвращает массив возможных координат нахождений робота
      *
-     * @param field
      * @return массив координат, где модет находиться робот
      */
 	public static ArrayList<int[]> getRobotCoordinatesOnMainLab(ArrayList<ArrayList<LabItem>> field){
@@ -171,8 +168,6 @@ public class LabAnalyzer {
      * просканированный лабиринт с главным в различный направлениях соответственно
      *
      *
-     * @param field
-     * @return
      */
 	private static ArrayList<int[]> getRobotCoordinatesNotRotatedAnalyzer(ArrayList<ArrayList<LabItem>> field){
 		ArrayList<int[]> potentialCor = new ArrayList<int[]>();
@@ -288,7 +283,6 @@ public class LabAnalyzer {
     /**
      * Getters and Setters просканированного поля и координат в нем робота
      *
-     * @return
      */
 	public static ArrayList<ArrayList<LabItem>> getAnalyzeField() {
 		return analyzeField;
