@@ -218,7 +218,7 @@ public class LabAnalyzer {
 		for(int j = 0; j <= field.get(0).size() - analyzeField.get(0).size(); j++){
 			for(int i = 0; i <= field.size() - analyzeField.size(); i ++){
 				if (equalsPartsOfFieldsOverRotated(field, i, j)) {
-					potentialCor.add(new int[] {i + (analyzeField.size() - corNow[0] - 1), j + (analyzeField.get(0).size() - corNow[1])});
+					potentialCor.add(new int[] {i + (analyzeField.size() - corNow[0] - 1), j + (analyzeField.get(0).size() - corNow[1] - 1)});
 				}
 			}
 		}

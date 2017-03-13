@@ -1,12 +1,14 @@
 package ru.li24robotics.ev3.robolab.lab;
 
+import java.io.Serializable;
+
 /**
  * Класс описывает стену либиринта. LabItem состоит из данных классов
  *
  * @see ru.li24robotics.ev3.robolab.lab.LabItem
  * @author Smetanin Gleb
  */
-public class LabWall {
+public class LabWall implements Serializable{
 	/**
 	 * Два поля хранят известно ли что нибудь о данной стене, и если известно
 	 * то есть ли здесь стена, или нет

@@ -1,6 +1,8 @@
 package ru.li24robotics.ev3.robolab.lab;
 
 
+import java.io.Serializable;
+
 /**
  * Класс описывает ячейку либаринта, состоящую из четырех сторон, где могут
  * быть стены
@@ -8,7 +10,7 @@ package ru.li24robotics.ev3.robolab.lab;
  * @see ru.li24robotics.ev3.robolab.lab.LabWall
  * @author Smetanin Gleb
  */
-public class LabItem {
+public class LabItem implements Serializable{
     /**
      * Поля хранят четыре стены соответственно и ключ, нужный для отслеживания
      * работы алгоритма
@@ -91,8 +93,8 @@ public class LabItem {
         }
         if(this.toBack.equals(item.toRight)
         		&& this.toForward.equals(item.toLeft)
-        		&& this.toLeft.equals(item.toForward)
-        		&& this.toRight.equals(item.toBack)){
+        		&& this.toLeft.equals(item.toBack)
+        		&& this.toRight.equals(item.toForward)){
         	return true;
         }else{
         	return false;
