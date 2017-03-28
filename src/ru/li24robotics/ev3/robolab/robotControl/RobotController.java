@@ -1,9 +1,7 @@
 package ru.li24robotics.ev3.robolab.robotControl;
 
 
-
-public class RobotController implements IMoveRobot, IWatcher{
-
+public class RobotController implements IRobotController{
     @Override
     public void forwardForChecks(int countCheck) {
 
