@@ -1,4 +1,4 @@
-package ru.li24robotics.ev3.robolab.move;
+package ru.li24robotics.ev3.robolab.robotControl;
 
 
 public interface IMoveRobot {
