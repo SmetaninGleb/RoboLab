@@ -19,6 +19,39 @@ public class LabAnalyzeController {
         int[] mainCoordinates = {0,0};
 
 
+
+
         return mainCoordinates;
     }
+
+    private void lookAround(){
+        lookForward();
+        lookBack();
+    }
+    private void lookForward(){
+        LabItem labItemMiddle = new LabItem("1");
+        labItemMiddle.toForward.setWallIsHere(false);
+        labItemMiddle.toBack.setWallIsHere(false);
+        LabItem labItemEnd = new LabItem("1");
+        labItemEnd.toBack.setWallIsHere(false);
+        labItemEnd.toForward.setWallIsHere(true);
+        for(int i = 0; i < controller.checksCountToWallAtForward() - 1; i++){
+            LabAnalyzer.addItemToForward(labItemMiddle);
+        }
+        LabAnalyzer.addItemToForward(labItemEnd);
+    }
+
+    private void lookBack(){
+        LabItem labItemMiddle = new LabItem("1");
+        labItemMiddle.toForward.setWallIsHere(false);
+        labItemMiddle.toBack.setWallIsHere(false);
+        LabItem labItemEnd = new LabItem("1");
+        labItemEnd.toBack.setWallIsHere(true);
+        labItemEnd.toForward.setWallIsHere(false);
+        for(int i = 0; i < controller.checksCountToWallAtForward() - 1; i++){
+            LabAnalyzer.addItemToBack(labItemMiddle);
+        }
+        LabAnalyzer.addItemToBack(labItemEnd);
+    }
+    //TODO realize for right and left!!!
 }
