@@ -31,7 +31,7 @@ public class LabAnalyzeController {
             mainCoordinates = LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).get(1);
             return mainCoordinates;
         }
-
+        //TODO add optimal algorithm
 
 
         return mainCoordinates;
