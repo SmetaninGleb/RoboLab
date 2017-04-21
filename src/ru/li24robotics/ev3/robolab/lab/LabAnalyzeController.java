@@ -5,130 +5,251 @@ import ru.li24robotics.ev3.robolab.robotControl.IRobotController;
 
 import java.util.ArrayList;
 
+/**
+ * Внимание! Считать, что направление лабиринта
+ * постоянно относительно начального положения робота!
+ */
 public class LabAnalyzeController {
     IRobotController controller;
     ArrayList<ArrayList<LabItem>> mainField;
-    int[] mainCoordinates = {0,0};
-    LabItem labItemLeftMiddle;
-    LabItem labItemLeftEnd;
-    LabItem labItemRightMiddle;
-    LabItem labItemRightEnd;
-    LabItem labItemForwardMiddle;
-    LabItem labItemForwardEnd;
-    LabItem labItemBackMiddle;
-    LabItem labItemBackEnd;
+    int[] mainCoordinates = {0, 0};
+    LabItem nowItem;
+    StandardItems sItems = new StandardItems();
 
+    //Для отслеживания поворота робота при построении лабиринта
+    private int turnDegreesParametr = 0;
 
-    public LabAnalyzeController(ArrayList<ArrayList<LabItem>> mainField, IRobotController controller){
+    public LabAnalyzeController(ArrayList<ArrayList<LabItem>> mainField, IRobotController controller)
+    {
         this.mainField = mainField;
         this.controller = controller;
     }
 
-    public int[] Analyze(LabItem startLabItem){
-        LabAnalyzer.InitLabAnalyzer(startLabItem);
-        lookAroundFirst();
-        if(isWeKnowCoordinates()){
-            mainCoordinates = LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).get(1);
-            return mainCoordinates;
-        }
-        //TODO add optimal algorithm
-
+    public int[] Analyze()
+    {
 
         return mainCoordinates;
     }
 
-    private void lookAroundFirst(){
-        lookForwardFirst();
-        lookBackFirst();
-        lookRightFirst();
-        lookLeftFirst();
-    }
-    private void lookForwardFirst(){
-        labItemForwardMiddle = new LabItem("1");
-        labItemForwardMiddle.toForward.setWallIsHere(false);
-        labItemForwardMiddle.toBack.setWallIsHere(false);
-        LabItem labItemForwardEnd = new LabItem("1");
-        labItemForwardEnd.toBack.setWallIsHere(false);
-        labItemForwardEnd.toForward.setWallIsHere(true);
-
-        for(int i = 0; i < controller.checksCountToWallAtForward() - 1; i++){
-            LabAnalyzer.addItemToForward(labItemForwardMiddle);
+    private void buildLabAtForward()
+    {
+        int _checkCount = lookForward_count();
+        nowItem = sItems.f_mid;
+        for(int i = 0; i < _checkCount - 1; i++)
+        {
+            putItemToForward();
         }
-        LabAnalyzer.addItemToForward(labItemForwardEnd);
+        nowItem = sItems.f_end;
+        putItemToForward();
     }
-    private void lookBackFirst(){
-        labItemBackMiddle = new LabItem("1");
-        labItemBackMiddle.toForward.setWallIsHere(false);
-        labItemBackMiddle.toBack.setWallIsHere(false);
-        LabItem labItemBackEnd = new LabItem("1");
-        labItemBackEnd.toBack.setWallIsHere(true);
-        labItemBackEnd.toForward.setWallIsHere(false);
 
-        for(int i = 0; i < controller.checksCountToWallAtBack() - 1; i++){
-            LabAnalyzer.addItemToBack(labItemBackMiddle);
+    private void buildLabAtRigth()
+    {
+        int _checkCount = lookRight_count();
+        nowItem = sItems.r_mid;
+        for(int i = 0; i < _checkCount - 1; i++)
+        {
+            putItemToRight();
         }
-        LabAnalyzer.addItemToBack(labItemBackEnd);
+        nowItem = sItems.r_end;
+        putItemToRight();
     }
-    private void lookRightFirst(){
-        labItemRightMiddle = new LabItem("1");
-        labItemRightMiddle.toRight.setWallIsHere(false);
-        labItemRightMiddle.toLeft.setWallIsHere(false);
-        LabItem labItemRightEnd = new LabItem("1");
-        labItemRightEnd.toRight.setWallIsHere(true);
-        labItemRightEnd.toLeft.setWallIsHere(false);
 
-        for(int i = 0; i < controller.checksCountToWallAtRight() - 1; i++){
-            LabAnalyzer.addItemToRight(labItemRightMiddle);
+    private void buildLabAtLeft()
+    {
+        int _checkCount = lookLeft_count();
+        nowItem = sItems.l_mid;
+        for(int i = 0; i < _checkCount - 1; i++)
+        {
+            putItemToLeft();
         }
-        LabAnalyzer.addItemToRight(labItemRightEnd);
+        nowItem = sItems.l_end;
+        putItemToLeft();
     }
-    private void lookLeftFirst(){
-        labItemLeftMiddle = new LabItem("1");
-        labItemLeftMiddle.toLeft.setWallIsHere(false);
-        labItemLeftMiddle.toRight.setWallIsHere(false);
-        labItemLeftEnd = new LabItem("1");
-        labItemLeftEnd.toLeft.setWallIsHere(true);
-        labItemLeftEnd.toRight.setWallIsHere(false);
 
-        for(int i = 0; i < controller.checksCountToWallAtLeft() - 1; i++){
-            LabAnalyzer.addItemToLeft(labItemLeftMiddle);
+    private void buildLabAtBack()
+    {
+        int _checkCount = lookBack_count();
+        nowItem = sItems.b_mid;
+        for(int i = 0; i < _checkCount - 1; i++)
+        {
+            putItemToBack();
         }
-        LabAnalyzer.addItemToLeft(labItemLeftEnd);
+        nowItem = sItems.b_end;
+        putItemToBack();
     }
 
-    private boolean isWeKnowCoordinates(){
-        if(LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).size() == 1){
+    private int lookForward_count()
+    {
+        int _checkCount = 0;
+        switch (turnDegreesParametr)
+        {
+            case 0:
+                _checkCount = controller.checksCountToWallAtForward();
+                break;
+            case 90:
+                _checkCount = controller.checksCountToWallAtRight();
+                break;
+            case 180:
+                _checkCount = controller.checksCountToWallAtBack();
+                break;
+            case 270:
+                _checkCount = controller.checksCountToWallAtLeft();
+                break;
+        }
+        return _checkCount;
+    }
+
+    private int lookRight_count()
+    {
+        int _checkCount = 0;
+        switch (turnDegreesParametr)
+        {
+            case 0:
+                _checkCount = controller.checksCountToWallAtRight();
+                break;
+            case 90:
+                _checkCount = controller.checksCountToWallAtBack();
+                break;
+            case 180:
+                _checkCount = controller.checksCountToWallAtLeft();
+                break;
+            case 270:
+                _checkCount = controller.checksCountToWallAtForward();
+                break;
+        }
+        return _checkCount;
+    }
+
+    private int lookBack_count()
+    {
+        int _checkCount = 0;
+        switch (turnDegreesParametr)
+        {
+            case 0:
+                _checkCount = controller.checksCountToWallAtBack();
+                break;
+            case 90:
+                _checkCount = controller.checksCountToWallAtLeft();
+                break;
+            case 180:
+                _checkCount = controller.checksCountToWallAtForward();
+                break;
+            case 270:
+                _checkCount = controller.checksCountToWallAtRight();
+                break;
+        }
+        return _checkCount;
+    }
+
+    private int lookLeft_count()
+    {
+        int _checkCount = 0;
+        switch (turnDegreesParametr)
+        {
+            case 0:
+                _checkCount = controller.checksCountToWallAtLeft();
+                break;
+            case 90:
+                _checkCount = controller.checksCountToWallAtForward();
+                break;
+            case 180:
+                _checkCount = controller.checksCountToWallAtRight();
+                break;
+            case 270:
+                _checkCount = controller.checksCountToWallAtBack();
+                break;
+        }
+        return _checkCount;
+    }
+
+    private void putItemToForward()
+    {
+        LabAnalyzer.addItemToForward(nowItem);
+    }
+
+    private void putItemToRight()
+    {
+        LabAnalyzer.addItemToRight(nowItem);
+    }
+
+    private void putItemToBack()
+    {
+        LabAnalyzer.addItemToBack(nowItem);
+    }
+
+    private void putItemToLeft()
+    {
+        LabAnalyzer.addItemToLeft(nowItem);
+    }
+
+    private boolean isWeKnowCoordinates() {
+        if (LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).size() == 1) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    private void moveForwardForChecks(int checksCount){
-        controller.forwardForChecks(checksCount);
-        for(int i = 0; i < checksCount; i ++){
-            LabAnalyzer.putRobotToForwad();
+    class StandardItems
+    {
+        LabItem f_mid;
+        LabItem f_end;
+        LabItem b_mid;
+        LabItem b_end;
+        LabItem r_mid;
+        LabItem r_end;
+        LabItem l_mid;
+        LabItem l_end;
+
+        public StandardItems()
+        {
+            f_mid = new LabItem("1");
+            f_end = new LabItem("1");
+            r_mid = new LabItem("1");
+            r_end = new LabItem("1");
+            l_mid = new LabItem("1");
+            l_end = new LabItem("1");
+            b_mid = new LabItem("1");
+            b_end = new LabItem("1");
+            build();
         }
-    }
-    private void moveBackForChecks(int checksCount){
-        controller.turnBack();
-        controller.forwardForChecks(checksCount);
-        for(int i = 0; i < checksCount; i ++){
-            LabAnalyzer.putRobotToBack();
+
+        private void build()
+        {
+            buildF();
+            buildR();
+            buildB();
+            buildL();
         }
-    }
-    private void moveRightForChecks(int checksCount){
-        controller.turnRight();
-        controller.forwardForChecks(checksCount);
-        for(int i = 0; i < checksCount; i ++){
-            LabAnalyzer.putRobotToRight();
+
+        private void buildF()
+        {
+            f_mid.toForward.setWallIsHere(false);
+            f_mid.toBack.setWallIsHere(false);
+            f_end.toBack.setWallIsHere(false);
+            f_end.toForward.setWallIsHere(true);
         }
-    }
-    private void moveLeftForChecks(int checksCount){
-        controller.turnLeft();
-        controller.forwardForChecks(checksCount);
-        for(int i = 0; i < checksCount; i ++){
-            LabAnalyzer.putRobotToForwad();
+        private void buildR()
+        {
+            r_mid.toRight.setWallIsHere(false);
+            r_mid.toLeft.setWallIsHere(false);
+            r_end.toLeft.setWallIsHere(false);
+            r_end.toRight.setWallIsHere(true);
+        }
+        private void buildL()
+        {
+            l_mid.toLeft.setWallIsHere(false);
+            l_mid.toRight.setWallIsHere(false);
+            l_end.toRight.setWallIsHere(false);
+            l_end.toLeft.setWallIsHere(true);
+        }
+        private void buildB()
+        {
+            b_mid.toForward.setWallIsHere(false);
+            b_mid.toBack.setWallIsHere(false);
+            b_end.toForward.setWallIsHere(false);
+            b_end.toBack.setWallIsHere(true);
         }
     }
 }

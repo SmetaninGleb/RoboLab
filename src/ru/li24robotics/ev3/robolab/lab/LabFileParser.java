@@ -1,6 +1,8 @@
 package ru.li24robotics.ev3.robolab.lab;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author Smetanin Gleb
  */
-public class LabFileParser{
+public class LabFileParser {
     private static ArrayList<ArrayList<LabItem>> mainLab;
     private static FileInputStream fileInputStream;
     private static ObjectInputStream objectInputStream;
@@ -20,7 +22,6 @@ public class LabFileParser{
         fileInputStream = new FileInputStream("MainLab.out");
         objectInputStream = new ObjectInputStream(fileInputStream);
     }
-
 
 
     public static ArrayList<ArrayList<LabItem>> getMainLab() throws IOException, ClassNotFoundException {
