@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class MainTestClass {
 
 	public static void main(String args[]) throws IOException, ClassNotFoundException {
-		
+
 	}
 	
 }

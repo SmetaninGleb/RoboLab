@@ -6,7 +6,7 @@ import ru.li24robotics.ev3.robolab.robotControl.IRobotController;
 import java.util.ArrayList;
 
 /**
- * Внимание! Считать, что направление лабиринта
+ * Внимание! Считать, что направление строящегося лабиринта
  * постоянно относительно начального положения робота!
  */
 public class LabAnalyzeController {
@@ -16,10 +16,11 @@ public class LabAnalyzeController {
     LabItem nowItem;
     StandardItems sItems = new StandardItems();
 
-    //Для отслеживания поворота робота при построении лабиринта
-    private int turnDegreesParametr = 0;
+    //Для отслеживания поворота робота при построении лабиринта по часовой стрелке
+    private int turnDegreesParameter = 0;
 
-    public LabAnalyzeController(ArrayList<ArrayList<LabItem>> mainField, IRobotController controller)
+    public LabAnalyzeController(ArrayList<ArrayList<LabItem>> mainField,
+                                IRobotController controller)
     {
         this.mainField = mainField;
         this.controller = controller;
@@ -27,8 +28,156 @@ public class LabAnalyzeController {
 
     public int[] Analyze()
     {
+        buildLabAround();
+        while(!isKnowCoordinates())
+        {
+            goNextIteration();
+            buildLabAround();
+        }
 
+        takeCoordinates();
         return mainCoordinates;
+    }
+
+    private void goNextIteration()
+    {
+        if(!controller.isWallNearForward())
+        {
+            goForwardToWall();
+            return;
+        }
+        else if(!controller.isWallNearRight())
+        {
+            goRightToWall();
+        }
+        else if(!controller.isWallNearLeft())
+        {
+            goLeftToWall();
+        }
+        else if(!controller.isWallNearBack())
+        {
+            goBackToWall();
+        }
+        else {
+            System.out.println("Я в ***ном тупике, с*ки!");
+        }
+    }
+
+    private void goForwardToWall()
+    {
+        int _checkCountToWall = lookForward_count();
+        switch (turnDegreesParameter)
+        {
+            case 90:
+                turnLeft();
+                break;
+            case 180:
+                turnBack();
+                break;
+            case 270:
+                turnRight();
+                break;
+        }
+        controller.forwardToWall();
+        for(int i = 0; i < _checkCountToWall; i++)
+        {
+            LabAnalyzer.putRobotToForwad();
+        }
+    }
+
+    private void goRightToWall()
+    {
+        int _checkCountToWall = lookRight_count();
+        switch(turnDegreesParameter)
+        {
+            case 0:
+                turnRight();
+                break;
+            case 180:
+                turnLeft();
+                break;
+            case 270:
+                turnBack();
+                break;
+        }
+        controller.forwardToWall();
+        for(int i = 0; i < _checkCountToWall; i++)
+        {
+            LabAnalyzer.putRobotToRight();
+        }
+    }
+
+    private void goLeftToWall()
+    {
+        int _checkCountToWall = lookLeft_count();
+        switch(turnDegreesParameter)
+        {
+            case 0:
+                turnLeft();
+                break;
+            case 90:
+                turnBack();
+                break;
+            case 180:
+                turnRight();
+                break;
+        }
+        controller.forwardToWall();
+        for(int i = 0; i < _checkCountToWall; i++)
+        {
+            LabAnalyzer.putRobotToLeft();
+        }
+    }
+
+    private void goBackToWall()
+    {
+        int _checkCountToWall = lookBack_count();
+        switch(turnDegreesParameter)
+        {
+            case 0:
+                turnBack();
+                break;
+            case 90:
+                turnRight();
+                break;
+            case 270:
+                turnLeft();
+                break;
+        }
+        controller.forwardToWall();
+        for(int i = 0; i < _checkCountToWall; i++)
+        {
+            LabAnalyzer.putRobotToBack();
+        }
+    }
+
+    private void turnRight()
+    {
+        turnDegreesParameter += 90;
+        turnDegreesParameter %= 360;
+        controller.turnRight();
+    }
+
+    private void turnLeft()
+    {
+        turnDegreesParameter += 270;
+        turnDegreesParameter %= 360;
+        controller.turnLeft();
+    }
+
+    private void turnBack()
+    {
+        turnDegreesParameter += 180;
+        turnDegreesParameter %= 360;
+        controller.turnBack();
+    }
+
+    private void buildLabAround()
+    {
+        buildLabAtForward();
+        buildLabAtRight();
+        buildLabAtBack();
+        buildLabAtLeft();
     }
 
     private void buildLabAtForward()
@@ -43,7 +192,7 @@ public class LabAnalyzeController {
         putItemToForward();
     }
 
-    private void buildLabAtRigth()
+    private void buildLabAtRight()
     {
         int _checkCount = lookRight_count();
         nowItem = sItems.r_mid;
@@ -82,7 +231,7 @@ public class LabAnalyzeController {
     private int lookForward_count()
     {
         int _checkCount = 0;
-        switch (turnDegreesParametr)
+        switch (turnDegreesParameter)
         {
             case 0:
                 _checkCount = controller.checksCountToWallAtForward();
@@ -103,7 +252,7 @@ public class LabAnalyzeController {
     private int lookRight_count()
     {
         int _checkCount = 0;
-        switch (turnDegreesParametr)
+        switch (turnDegreesParameter)
         {
             case 0:
                 _checkCount = controller.checksCountToWallAtRight();
@@ -124,7 +273,7 @@ public class LabAnalyzeController {
     private int lookBack_count()
     {
         int _checkCount = 0;
-        switch (turnDegreesParametr)
+        switch (turnDegreesParameter)
         {
             case 0:
                 _checkCount = controller.checksCountToWallAtBack();
@@ -145,7 +294,7 @@ public class LabAnalyzeController {
     private int lookLeft_count()
     {
         int _checkCount = 0;
-        switch (turnDegreesParametr)
+        switch (turnDegreesParameter)
         {
             case 0:
                 _checkCount = controller.checksCountToWallAtLeft();
@@ -183,11 +332,21 @@ public class LabAnalyzeController {
         LabAnalyzer.addItemToLeft(nowItem);
     }
 
-    private boolean isWeKnowCoordinates() {
-        if (LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).size() == 1) {
+    private boolean isKnowCoordinates()
+    {
+        if (LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).size() == 1)
+        {
             return true;
-        } else {
+        }
+        else {
             return false;
+        }
+    }
+
+    private void takeCoordinates()
+    {
+        if(isKnowCoordinates()) {
+            mainCoordinates = LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).get(0);
         }
     }
 

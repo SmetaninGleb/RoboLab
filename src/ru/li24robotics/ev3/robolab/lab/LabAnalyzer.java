@@ -139,7 +139,8 @@ public class LabAnalyzer {
             }
         }
         else {
-            analyzeField.get(corNow[0] + 1).set(corNow[1], item);
+            LabItem _now = labItemSum(item, analyzeField.get(corNow[0] + 1).get(corNow[1]));
+            analyzeField.get(corNow[0] + 1).set(corNow[1], _now);
         }
     }
 
@@ -155,8 +156,10 @@ public class LabAnalyzer {
                     analyzeField.get(0).add(i, null);
                 }
             }
-        } else {
-            analyzeField.get(corNow[0] - 1).set(corNow[1], item);
+        }
+        else {
+            LabItem _now = labItemSum(item, analyzeField.get(corNow[0] - 1).get(corNow[1]));
+            analyzeField.get(corNow[0] - 1).set(corNow[1], _now);
         }
     }
 
@@ -171,7 +174,8 @@ public class LabAnalyzer {
                 }
             }
         } else {
-            analyzeField.get(corNow[0]).set(corNow[1] + 1, item);
+            LabItem _now = labItemSum(item, analyzeField.get(corNow[0]).get(corNow[1] + 1));
+            analyzeField.get(corNow[0]).set(corNow[1] + 1, _now);
         }
 
     }
@@ -188,14 +192,62 @@ public class LabAnalyzer {
             }
             corNow[1]++;
         } else {
-            analyzeField.get(corNow[0]).set(corNow[1] - 1, item);
+            LabItem _now = labItemSum(item, analyzeField.get(corNow[0]).get(corNow[1] - 1));
+            analyzeField.get(corNow[0]).set(corNow[1] - 1, _now);
         }
     }
 
-    private static LabItem labItemAddition(LabItem item1, LabItem item2)
+    private static LabItem labItemSum(LabItem item1, LabItem item2)
     {
         LabItem sum = new LabItem("2");
-        //TODO Realize it, mother father!!!
+        if(!item1.toForward.isNothingAboutWallHere())
+        {
+            sum.toForward.setWallIsHere(item1.toForward.isWallIsHere());
+        }
+        else if (!item2.toForward.isNothingAboutWallHere())
+        {
+            sum.toForward.setWallIsHere(item2.toForward.isWallIsHere());
+        }
+        else {
+            sum.toForward.setNothingAboutWallHere(true);
+        }
+
+        if(!item1.toRight.isNothingAboutWallHere())
+        {
+            sum.toRight.setWallIsHere(item1.toRight.isWallIsHere());
+        }
+        else if (!item2.toRight.isNothingAboutWallHere())
+        {
+            sum.toRight.setWallIsHere(item2.toRight.isWallIsHere());
+        }
+        else {
+            sum.toRight.setNothingAboutWallHere(true);
+        }
+
+        if(!item1.toLeft.isNothingAboutWallHere())
+        {
+            sum.toLeft.setWallIsHere(item1.toLeft.isWallIsHere());
+        }
+        else if (!item2.toLeft.isNothingAboutWallHere())
+        {
+            sum.toLeft.setWallIsHere(item2.toLeft.isWallIsHere());
+        }
+        else {
+            sum.toLeft.setNothingAboutWallHere(true);
+        }
+
+        if(!item1.toBack.isNothingAboutWallHere())
+        {
+            sum.toBack.setWallIsHere(item1.toBack.isWallIsHere());
+        }
+        else if (!item2.toBack.isNothingAboutWallHere())
+        {
+            sum.toBack.setWallIsHere(item2.toBack.isWallIsHere());
+        }
+        else {
+            sum.toBack.setNothingAboutWallHere(true);
+        }
+
         return sum;
     }
 
