@@ -194,7 +194,8 @@ public class LabAnalyzeController {
 
     private void buildLabAtRight()
     {
-        int _checkCount = lookRight_count();
+        int _checkCo
+        unt = lookRight_count();
         nowItem = sItems.r_mid;
         for(int i = 0; i < _checkCount - 1; i++)
         {
