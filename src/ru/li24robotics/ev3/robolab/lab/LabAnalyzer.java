@@ -1,8 +1,6 @@
 package ru.li24robotics.ev3.robolab.lab;
 
 
-import com.sun.xml.internal.bind.v2.TODO;
-
 import java.util.ArrayList;
 
 /**
