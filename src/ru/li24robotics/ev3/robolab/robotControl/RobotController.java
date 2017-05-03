@@ -3,34 +3,53 @@ package ru.li24robotics.ev3.robolab.robotControl;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
+import lejos.utility.Delay;
 
 public class RobotController implements IRobotController{
 	private RegulatedMotor motor_r;
 	private RegulatedMotor motor_l;
 	private final Double CHECK_LENGHT = 0.3;
-	private final Double WHEEL_CIRCUM = 0.024;
-	private final int MAX_SPEED = 360;
+	private final Double WHEEL_CIRCUM = 2 * 0.028 * Math.PI;
+	private final int MAX_SPEED = 720;
+	private final int ACCELERAION = 360;
 	
-	public RobotController(Port motorPort_r, Port motorPort_l, Port sensorSonicPort_f,
-			Port sensorSonicPort_r, Port sensorSonicPort_l)
+	
+	public RobotController(Port motorPort_r, Port motorPort_l)
 	{
 		motor_r = new EV3LargeRegulatedMotor(motorPort_r);
 		motor_l = new EV3LargeRegulatedMotor(motorPort_l);
-		motor_r.synchronizeWith(new RegulatedMotor[]{motor_l});
+		motor_r.synchronizeWith(new RegulatedMotor[] {motor_l});
+		motor_r.setSpeed(0);
+		motor_l.setSpeed(0);
+    	motor_r.setAcceleration(ACCELERAION);
+    	motor_l.setAcceleration(ACCELERAION);
 	}
 	
     @Override
-    public void forwardForChecks(int countCheck) {
+    public void forwardForChecks(int countCheck) 
+    {
     	double _allLenght = CHECK_LENGHT * (double)countCheck;
     	double _allDegrees = _allLenght / WHEEL_CIRCUM * 360;
-    	int _firstTachoCount_r = motor_r.getTachoCount();
-    	int _firstTachoCount_l = motor_l.getTachoCount();
+    	motor_r.setSpeed(MAX_SPEED);
+    	motor_l.setSpeed(MAX_SPEED); 
     	motor_r.startSynchronization();
     	motor_r.rotate((int)_allDegrees);
     	motor_l.rotate((int)_allDegrees);
-    	
+    	motor_r.endSynchronization();
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
+    	motor_r.setSpeed(0);
+    	motor_l.setSpeed(0);
     }
-
+    
+    private void smoothMove(RegulatedMotor[] motors, int[] startTacho, int[] allDegrees)
+    {
+	  	for(RegulatedMotor motor : motors)
+	   	{
+	   		motor.setAcceleration(ACCELERAION);
+	  	}
+    }
+    
     @Override
     public void backForChecks(int countCheck) {
     	
