@@ -2,22 +2,38 @@ package ru.li24robotics.ev3.robolab.robotControl;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.RegulatedMotor;
+import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
 
 public class RobotController implements IRobotController{
 	private RegulatedMotor motor_r;
 	private RegulatedMotor motor_l;
+	private SensorModes sonicSensor_r;
+	private SensorModes sonicSensor_f;
+	private SensorModes sonicSensor_l;
+	private SampleProvider sonic_r;
+	private SampleProvider sonic_f;
+	private SampleProvider sonic_l;
 	private final Double CHECK_LENGHT = 0.3;
 	private final Double WHEEL_CIRCUM = 2 * 0.028 * Math.PI;
 	private final int MAX_SPEED = 720;
 	private final int ACCELERAION = 360;
 	
 	
-	public RobotController(Port motorPort_r, Port motorPort_l)
+	public RobotController(Port motorPort_r, Port motorPort_l, Port sonicPort_r, Port sonicPort_f, Port sonicPort_l)
 	{
 		motor_r = new EV3LargeRegulatedMotor(motorPort_r);
 		motor_l = new EV3LargeRegulatedMotor(motorPort_l);
+		sonicSensor_r = new EV3UltrasonicSensor(sonicPort_r);
+		sonicSensor_f = new EV3UltrasonicSensor(sonicPort_f);
+		sonicSensor_l = new EV3UltrasonicSensor(sonicPort_l);
+		sonic_r = sonicSensor_r.getMode("Distance");
+		sonic_f = sonicSensor_f.getMode("Distance");
+		sonic_l = sonicSensor_l.getMode("Distance");
+		
 		motor_r.synchronizeWith(new RegulatedMotor[] {motor_l});
 		motor_r.setSpeed(0);
 		motor_l.setSpeed(0);
@@ -41,15 +57,7 @@ public class RobotController implements IRobotController{
     	motor_r.setSpeed(0);
     	motor_l.setSpeed(0);
     }
-    
-    private void smoothMove(RegulatedMotor[] motors, int[] startTacho, int[] allDegrees)
-    {
-	  	for(RegulatedMotor motor : motors)
-	   	{
-	   		motor.setAcceleration(ACCELERAION);
-	  	}
-    }
-    
+        
     @Override
     public void backForChecks(int countCheck) {
     	
@@ -82,41 +90,66 @@ public class RobotController implements IRobotController{
 
     @Override
     public boolean isWallNearLeft() {
-        return false;
+        return checksCountToWallAtLeft() == 0;
     }
 
     @Override
     public boolean isWallNearForward() {
-        return false;
+        return checksCountToWallAtForward() == 0;
     }
 
     @Override
     public boolean isWallNearRight() {
-        return false;
+        return checksCountToWallAtRight() == 0;
     }
 
     @Override
     public boolean isWallNearBack() {
-        return false;
+        return checksCountToWallAtBack() == 0;
     }
 
     @Override
     public int checksCountToWallAtLeft() {
-        return 0;
+        int _count;
+        double _distance;
+        float[] _sample = new float[sonic_l.sampleSize()];
+        sonic_l.fetchSample(_sample, 0);
+        _distance = (double)_sample[0];
+        //Переводим дистанцию в метры
+        _count = (int)(_distance * 100 / CHECK_LENGHT);
+    	return _count;
     }
 
     @Override
     public int checksCountToWallAtRight() {
-        return 0;
+    	int _count;
+        double _distance;
+        float[] _sample = new float[sonic_r.sampleSize()];
+        sonic_r.fetchSample(_sample, 0);
+        _distance = (double)_sample[0];
+        //Переводим дистанцию в метры
+        _count = (int)(_distance * 100 / CHECK_LENGHT);
+    	return _count;
     }
 
     @Override
     public int checksCountToWallAtBack() {
-        return 0;
+        int _count;
+        turnRight();
+        _count = checksCountToWallAtRight();
+        turnLeft();
+    	return _count;
     }
 
     @Override
     public int checksCountToWallAtForward() {
-        return 0;
+    	int _count;
+        double _distance;
+        float[] _sample = new float[sonic_f.sampleSize()];
+        sonic_f.fetchSample(_sample, 0);
+        _distance = (double)_sample[0];
+        //Переводим дистанцию в метры
+        _count = (int)(_distance * 100 / CHECK_LENGHT);
+    	return _count;
     }
 }
