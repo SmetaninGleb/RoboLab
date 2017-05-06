@@ -25,8 +25,6 @@ public class LabAnalyzer {
      */
     public static void InitLabAnalyzer(LabItem startItem)
     {
-
-
         analyzeField = new ArrayList<ArrayList<LabItem>>();
         analyzeField.add(new ArrayList<LabItem>());
         analyzeField.get(0).add(startItem);
@@ -37,7 +35,7 @@ public class LabAnalyzer {
      * {@code putRobotToRight}, {@code putRobotToLeft} перемещает робота в анализируемом поле {@code analyzeField},
      * меняет координаты {@code corNow} робота в нем
      */
-    public static void putRobotToForwad()
+    public static void putRobotToForward()
     {
         corNow[1]++;
         if (analyzeField.get(0).size() == corNow[1]) {
@@ -195,6 +193,11 @@ public class LabAnalyzer {
         }
     }
 
+    public void setNowItem(LabItem item)
+    {
+    	analyzeField.get(corNow[0]).set(corNow[1], labItemSum(item, analyzeField.get(corNow[0]).get(corNow[1])));
+    }
+    
     private static LabItem labItemSum(LabItem item1, LabItem item2)
     {
         LabItem sum = new LabItem("2");

@@ -4,6 +4,8 @@ package ru.li24robotics.ev3.robolab.lab;
 import ru.li24robotics.ev3.robolab.robotControl.IRobotController;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 
 /**
  * Внимание! Считать, что направление строящегося лабиринта
@@ -31,8 +33,8 @@ public class LabAnalyzeController {
         buildLabAround();
         while(!isKnowCoordinates())
         {
-            goNextIteration();
-            buildLabAround();
+        	goNextIterationForOneCheck();
+            buildLabAround_one();
         }
 
         takeCoordinates();
@@ -62,6 +64,44 @@ public class LabAnalyzeController {
             System.out.println("Я в ***ном тупике, с*ки!");
         }
     }
+    
+    
+    
+    private void goNextIterationForOneCheck()
+    {
+    	if(!controller.isWallNearForward())
+    	{
+    		goToForward();
+    	}
+    	else if(!controller.isWallNearLeft() && !controller.isWallNearRight())
+    	{
+    		int _randPoint;
+    		final Random _rand = new Random();
+    		_randPoint = _rand.nextInt(1);
+    		if(_randPoint == 0)
+    		{
+    			goToRight();
+    		}
+    		else {
+    			goToLeft();
+    		}
+    	}
+    	else if(!controller.isWallNearRight())
+    	{
+    		goToRight();
+    	}
+    	else if(!controller.isWallNearLeft())
+    	{
+    		goToLeft();
+    	}
+    	else if(!controller.isWallNearBack())
+    	{
+    		goToBack();
+    	}
+    	else {
+    		System.out.println("Я в ***ном тупике, с*ки!");
+    	}
+    }
 
     private void goForwardToWall()
     {
@@ -81,8 +121,7 @@ public class LabAnalyzeController {
         controller.forwardToWall();
         for(int i = 0; i < _checkCountToWall; i++)
         {
-            LabAnalyzer.putRobotToForwad();
-        }
+            LabAnalyzer.putRobotToForward();        }
     }
 
     private void goRightToWall()
@@ -150,7 +189,79 @@ public class LabAnalyzeController {
             LabAnalyzer.putRobotToBack();
         }
     }
-
+    
+    private void goToForward()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 90:
+    			turnLeft();
+    			break;
+    		case 180:
+    			turnBack();
+    			break;
+    		case 270:
+    			turnRight();
+    			break;
+    	}
+    	controller.forwardForChecks(1);
+    	LabAnalyzer.putRobotToForward();
+    }
+    
+    private void goToRight()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			turnRight();
+    			break;
+    		case 180:
+    			turnLeft();
+    			break;
+    		case 270:
+    			turnBack();
+    			break;
+    	}
+    	controller.forwardForChecks(1);
+    	LabAnalyzer.putRobotToRight();
+    }
+    
+    private void goToLeft()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			turnLeft();
+    			break;
+    		case 90:
+    			turnBack();
+    			break;
+    		case 180:
+    			turnRight();
+    			break;
+    	}
+    	controller.forwardForChecks(1);
+    	LabAnalyzer.putRobotToLeft();
+    }
+    
+    private void goToBack()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			turnBack();
+    			break;
+    		case 90:
+    			turnRight();
+    			break;
+    		case 270:
+    			turnLeft();
+    			break;
+    	}
+    	controller.forwardForChecks(1);
+    	LabAnalyzer.putRobotToBack();
+    }
+    
     private void turnRight()
     {
         turnDegreesParameter += 90;
@@ -178,6 +289,14 @@ public class LabAnalyzeController {
         buildLabAtRight();
         buildLabAtBack();
         buildLabAtLeft();
+    }
+    
+    private void buildLabAround_one()
+    {
+    	buildOneAtForward();
+    	buildOneAtRight();
+    	buildOneAtBack();
+    	buildOneAtLeft();
     }
 
     private void buildLabAtForward()
@@ -227,6 +346,54 @@ public class LabAnalyzeController {
         nowItem = sItems.b_end;
         putItemToBack();
     }
+    
+    private void buildOneAtForward()
+    {
+    	LabItem _now = new LabItem("1");
+    	_now.toForward.setWallIsHere(lookForward());
+    	if(lookForward())
+    	{
+    		LabItem _nowForward = new LabItem("1");
+    		_nowForward.toBack.setWallIsHere(false);
+    		LabAnalyzer.addItemToForward(_nowForward);
+    	}
+    }
+    
+    private void buildOneAtRight()
+    {
+    	LabItem _now = new LabItem("1");
+    	_now.toRight.setWallIsHere(lookRight());
+    	if(lookForward())
+    	{
+    		LabItem _nowRight = new LabItem("1");
+    		_nowRight.toLeft.setWallIsHere(false);
+    		LabAnalyzer.addItemToRight(_nowRight);
+    	}
+    }
+    
+    private void buildOneAtLeft()
+    {
+    	LabItem _now = new LabItem("1");
+    	_now.toLeft.setWallIsHere(lookLeft());
+    	if(lookLeft())
+    	{
+    		LabItem _nowLeft= new LabItem("1");
+    		_nowLeft.toRight.setWallIsHere(false);
+    		LabAnalyzer.addItemToLeft(_nowLeft);
+    	}
+    }
+    
+    private void buildOneAtBack()
+    {
+    	LabItem _now = new LabItem("1");
+    	_now.toBack.setWallIsHere(lookBack());
+    	if(lookBack())
+    	{
+    		LabItem _nowBack = new LabItem("1");
+    		_nowBack.toForward.setWallIsHere(false);
+    		LabAnalyzer.addItemToBack(_nowBack);
+    	}
+    }
 
     private int lookForward_count()
     {
@@ -245,7 +412,7 @@ public class LabAnalyzeController {
             case 270:
                 _checkCount = controller.checksCountToWallAtLeft();
                 break;
-        }
+         }
         return _checkCount;
     }
 
@@ -311,7 +478,71 @@ public class LabAnalyzeController {
         }
         return _checkCount;
     }
+    
+    private boolean lookForward()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			return controller.isWallNearForward();
+    		case 90:
+    			return controller.isWallNearLeft();
+    		case 180:
+    			return controller.isWallNearBack();
+    		case 270:
+    			return controller.isWallNearRight();
+    	}
+    	return false;
+    }
+    
+    private boolean lookRight()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			return controller.isWallNearRight();
+    		case 90:
+    			return controller.isWallNearForward();
+    		case 180:
+    			return controller.isWallNearLeft();
+    		case 270:
+    			return controller.isWallNearBack();
+    	}
+    	return false;
+    }
 
+    private boolean lookLeft()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			return controller.isWallNearLeft();
+    		case 90:
+    			return controller.isWallNearBack();
+    		case 180:
+    			return controller.isWallNearRight();
+    		case 270:
+    			return controller.isWallNearForward();
+    	}
+    	return false;
+    }
+    
+    private boolean lookBack()
+    {
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			return controller.isWallNearBack();
+    		case 90:
+    			return controller.isWallNearRight();
+    		case 180:
+    			return controller.isWallNearForward();
+    		case 270:
+    			return controller.isWallNearLeft();
+    	}
+    	return false;
+    }
+    
     private void putItemToForward()
     {
         LabAnalyzer.addItemToForward(nowItem);
