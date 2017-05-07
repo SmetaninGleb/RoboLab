@@ -20,7 +20,7 @@ public class RobotController implements IRobotController{
 	private SampleProvider sonic_r;
 	private SampleProvider sonic_f;
 	private SampleProvider sonic_l;
-	private int PerfectRotationAngle = 0;
+	private int perfectRotationAngle = 0;
 	private boolean isWallBack;
 	private final Double CHECK_LENGHT = 0.3;
 	private final Double WHEEL_CIRCUM = 2 * 0.028 * Math.PI;
@@ -89,7 +89,7 @@ public class RobotController implements IRobotController{
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	int _startDegrees = PerfectRotationAngle;
+    	int _startDegrees = perfectRotationAngle;
     	motor_r.setSpeed(MIN_ROTATE_SPEED);
     	motor_l.setSpeed(MIN_ROTATE_SPEED);
     	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
@@ -118,7 +118,7 @@ public class RobotController implements IRobotController{
     	motor_r.setSpeed(0);
     	motor_l.setAcceleration(ACCELERATION);
     	motor_r.setAcceleration(ACCELERATION);
-    	PerfectRotationAngle -= TO_RIGHT_DEGREES;
+    	perfectRotationAngle -= TO_RIGHT_DEGREES;
     	_nowSample = null;
     	colibrateRotate();
     }
@@ -129,7 +129,7 @@ public class RobotController implements IRobotController{
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	int _startDegrees = PerfectRotationAngle;
+    	int _startDegrees = perfectRotationAngle;
     	motor_r.setSpeed(MIN_ROTATE_SPEED);
     	motor_l.setSpeed(MIN_ROTATE_SPEED);
     	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
@@ -158,7 +158,7 @@ public class RobotController implements IRobotController{
     	motor_r.setSpeed(0);
     	motor_l.setAcceleration(ACCELERATION);
     	motor_r.setAcceleration(ACCELERATION);
-    	PerfectRotationAngle += TO_LEFT_DEGREES;
+    	perfectRotationAngle += TO_LEFT_DEGREES;
     	_nowSample = null;
     	colibrateRotate();
     }
@@ -187,7 +187,7 @@ public class RobotController implements IRobotController{
     		motor_r.waitComplete();
         	motor_l.waitComplete();
     		((EV3GyroSensor)gyroSensor).reset();
-    		PerfectRotationAngle = 0;
+    		perfectRotationAngle = 0;
     		
     		motor_r.setSpeed(MAX_SPEED/10);
     		motor_l.setSpeed(MAX_SPEED/10);

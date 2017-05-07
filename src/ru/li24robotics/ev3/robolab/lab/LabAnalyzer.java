@@ -289,7 +289,7 @@ public class LabAnalyzer {
         for (int j = 0; j <= field.get(0).size() - analyzeField.get(0).size(); j++) {
             for (int i = 0; i <= field.size() - analyzeField.size(); i++) {
                 if (equalsPartsOfFieldsNotRotated(field, i, j)) {
-                    potentialCor.add(new int[]{i + corNow[0], j + corNow[1]});
+                    potentialCor.add(new int[]{i + corNow[0], j + corNow[1], 0});
                 }
             }
         }
@@ -312,7 +312,7 @@ public class LabAnalyzer {
         for (int j = 0; j <= field.get(0).size() - analyzeField.size(); j++) {
             for (int i = 0; i <= field.size() - analyzeField.get(0).size(); i++) {
                 if (equalsPartsOfFieldsRightRotated(field, i, j)) {
-                    potentialCor.add(new int[]{i + corNow[1], j + (analyzeField.size() - corNow[0] - 1)});
+                    potentialCor.add(new int[]{i + corNow[1], j + (analyzeField.size() - corNow[0] - 1), 90});
                 }
             }
         }
@@ -335,7 +335,7 @@ public class LabAnalyzer {
         for (int j = 0; j <= field.get(0).size() - analyzeField.get(0).size(); j++) {
             for (int i = 0; i <= field.size() - analyzeField.size(); i++) {
                 if (equalsPartsOfFieldsOverRotated(field, i, j)) {
-                    potentialCor.add(new int[]{i + (analyzeField.size() - corNow[0] - 1), j + (analyzeField.get(0).size() - corNow[1] - 1)});
+                    potentialCor.add(new int[]{i + (analyzeField.size() - corNow[0] - 1), j + (analyzeField.get(0).size() - corNow[1] - 1), 180});
                 }
             }
         }
@@ -359,7 +359,7 @@ public class LabAnalyzer {
         for (int j = 0; j <= field.get(0).size() - analyzeField.size(); j++) {
             for (int i = 0; i <= field.size() - analyzeField.get(0).size(); i++) {
                 if (equalsPartsOfFieldsLeftRotated(field, i, j)) {
-                    potentialCor.add(new int[]{i + (analyzeField.get(0).size() - corNow[1] - 1), j + corNow[0]});
+                    potentialCor.add(new int[]{i + (analyzeField.get(0).size() - corNow[1] - 1), j + corNow[0], 270});
                 }
             }
         }

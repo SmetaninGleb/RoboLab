@@ -14,7 +14,7 @@ import java.util.Random;
 public class LabAnalyzeController {
     IRobotController controller;
     ArrayList<ArrayList<LabItem>> mainField;
-    int[] mainCoordinates = {0, 0};
+    int[] mainCoordinates = {0, 0, 0};
     LabItem nowItem;
     StandardItems sItems = new StandardItems();
 
