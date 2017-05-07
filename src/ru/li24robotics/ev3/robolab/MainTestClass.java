@@ -25,6 +25,25 @@ public class MainTestClass {
 	{
 		RobotController controller = new RobotController(MotorPort.A, MotorPort.D, LocalEV3.get().getPort("S1"),
 				LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S4"), LocalEV3.get().getPort("S3"));
+		controller.forwardForChecks(1);
+		controller.turnLeft();
+		controller.forwardForChecks(1);
+		controller.turnLeft();
+		Delay.msDelay(3000);
+		controller.forwardForChecks(1);
+		controller.forwardForChecks(1);
 		controller.turnRight();
+		controller.forwardForChecks(1);
+		controller.forwardForChecks(1);
+		controller.turnBack();
+		controller.forwardForChecks(1);
+		controller.forwardForChecks(1);
+		controller.turnRight();
+		controller.forwardForChecks(1);
+		controller.forwardForChecks(1);
+		controller.turnLeft();
+		controller.forwardForChecks(1);
+		controller.forwardForChecks(1);
+		
 	}
 }
