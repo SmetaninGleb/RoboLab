@@ -578,6 +578,7 @@ public class LabAnalyzeController {
     {
         if(isKnowCoordinates()) {
             mainCoordinates = LabAnalyzer.getRobotCoordinatesOnMainLab(mainField).get(0);
+            mainCoordinates[2] = (mainCoordinates[2] + turnDegreesParameter) % 360;
         }
     }
 
