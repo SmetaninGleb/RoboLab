@@ -1,8 +1,10 @@
 package ru.li24robotics.ev3.robolab;
 
+import ru.li24robotics.ev3.robolab.lab.LabAnalyzeController;
 import ru.li24robotics.ev3.robolab.lab.LabAnalyzer;
 import ru.li24robotics.ev3.robolab.lab.LabFileParser;
 import ru.li24robotics.ev3.robolab.lab.LabItem;
+import ru.li24robotics.ev3.robolab.lab.LabWall;
 import ru.li24robotics.ev3.robolab.robotControl.RobotController;
 
 import java.io.IOException;
@@ -23,27 +25,23 @@ public class MainTestClass {
 
 	public static void main(String args[])
 	{
-		RobotController controller = new RobotController(MotorPort.A, MotorPort.D, LocalEV3.get().getPort("S1"),
+		RobotController c = new RobotController(MotorPort.A, MotorPort.D, LocalEV3.get().getPort("S1"),
 				LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S4"), LocalEV3.get().getPort("S3"));
-		controller.forwardForChecks(1);
-		controller.turnLeft();
-		controller.forwardForChecks(1);
-		controller.turnLeft();
-		Delay.msDelay(3000);
-		controller.forwardForChecks(1);
-		controller.forwardForChecks(1);
-		controller.turnRight();
-		controller.forwardForChecks(1);
-		controller.forwardForChecks(1);
-		controller.turnBack();
-		controller.forwardForChecks(1);
-		controller.forwardForChecks(1);
-		controller.turnRight();
-		controller.forwardForChecks(1);
-		controller.forwardForChecks(1);
-		controller.turnLeft();
-		controller.forwardForChecks(1);
-		controller.forwardForChecks(1);
-		
+		LabAnalyzer.InitLabAnalyzer(new LabItem("1"));
+		LabAnalyzeController lc = null;
+		try {
+			LabFileParser.InitLabFileParser();
+			lc = new LabAnalyzeController(LabFileParser.getMainLab(), c);
+		} 
+		catch(IOException e) {
+			
+		}
+		catch (ClassNotFoundException e) {
+			
+		}
+		int[] ans = lc.Analyze();
+		System.out.println("Analyzed!!!");
+		Delay.msDelay(5000);
+		System.out.println(ans[0] + " " + ans[1] + " " + ans[2]);
 	}
 }

@@ -6,6 +6,8 @@ import ru.li24robotics.ev3.robolab.robotControl.IRobotController;
 import java.util.ArrayList;
 import java.util.Random;
 
+import lejos.utility.Delay;
+
 
 /**
  * Внимание! Считать, что направление строящегося лабиринта
@@ -30,11 +32,17 @@ public class LabAnalyzeController {
 
     public int[] Analyze()
     {
-        buildLabAround();
+        buildLabAround_one();
+        
+        int i=0;
         while(!isKnowCoordinates())
         {
+        	i++;
+        	LabAnalyzer.outField();
         	goNextIterationForOneCheck();
-            buildLabAround_one();
+        	buildLabAround_one();
+            
+            if (i==2) LabAnalyzer.out.close();
         }
 
         takeCoordinates();
@@ -297,6 +305,8 @@ public class LabAnalyzeController {
     	buildOneAtRight();
     	buildOneAtBack();
     	buildOneAtLeft();
+    	
+    	
     }
 
     private void buildLabAtForward()
@@ -351,8 +361,10 @@ public class LabAnalyzeController {
     {
     	LabItem _now = new LabItem("1");
     	_now.toForward.setWallIsHere(lookForward());
-    	if(lookForward())
+    	System.out.println("Forward1");
+    	if(!lookForward())
     	{
+    		System.out.println("Forward2");
     		LabItem _nowForward = new LabItem("1");
     		_nowForward.toBack.setWallIsHere(false);
     		LabAnalyzer.addItemToForward(_nowForward);
@@ -361,9 +373,9 @@ public class LabAnalyzeController {
     
     private void buildOneAtRight()
     {
-    	LabItem _now = new LabItem("1");
+    	LabItem _now = new LabItem("2");
     	_now.toRight.setWallIsHere(lookRight());
-    	if(lookForward())
+    	if(!lookForward())
     	{
     		LabItem _nowRight = new LabItem("1");
     		_nowRight.toLeft.setWallIsHere(false);
@@ -373,9 +385,9 @@ public class LabAnalyzeController {
     
     private void buildOneAtLeft()
     {
-    	LabItem _now = new LabItem("1");
+    	LabItem _now = new LabItem("3");
     	_now.toLeft.setWallIsHere(lookLeft());
-    	if(lookLeft())
+    	if(!lookLeft())
     	{
     		LabItem _nowLeft= new LabItem("1");
     		_nowLeft.toRight.setWallIsHere(false);
@@ -385,9 +397,9 @@ public class LabAnalyzeController {
     
     private void buildOneAtBack()
     {
-    	LabItem _now = new LabItem("1");
+    	LabItem _now = new LabItem("4");
     	_now.toBack.setWallIsHere(lookBack());
-    	if(lookBack())
+    	if(!lookBack())
     	{
     		LabItem _nowBack = new LabItem("1");
     		_nowBack.toForward.setWallIsHere(false);

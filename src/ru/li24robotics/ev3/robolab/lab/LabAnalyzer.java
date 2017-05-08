@@ -1,6 +1,8 @@
 package ru.li24robotics.ev3.robolab.lab;
 
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -37,34 +39,34 @@ public class LabAnalyzer {
      */
     public static void putRobotToForward()
     {
-        corNow[1]++;
-        if (analyzeField.get(0).size() == corNow[1]) {
+        if (analyzeField.get(0).size() - 1 == corNow[1]) {
             addItemToForward(new LabItem("2"));
         }
+        corNow[1]++;
     }
 
     public static void putRobotToBack()
     {
-        corNow[1]--;
-        if (corNow[1] < 0) {
+        if (corNow[1] == 0) {
             addItemToBack(new LabItem("2"));
         }
+        corNow[1]--;
     }
 
     public static void putRobotToRight()
     {
-        corNow[0]++;
-        if (corNow[0] == analyzeField.size()) {
+        if (corNow[0] == analyzeField.size() - 1) {
             addItemToRight(new LabItem("2"));
         }
+        corNow[0]++;
     }
 
     public static void putRobotToLeft()
     {
-        corNow[0]--;
-        if (corNow[0] < 0) {
+        if (corNow[0] == 0) {
             addItemToLeft(new LabItem("2"));
         }
+        corNow[0]--;
     }
 
     public static boolean isItemAtForward()
@@ -162,8 +164,10 @@ public class LabAnalyzer {
     public static void addItemToForward(LabItem item)
     {
         if (corNow[1] == analyzeField.get(corNow[0]).size() - 1) {
+        	System.out.println("OK");
             for (int i = 0; i < analyzeField.size(); i++) {
                 if (i == corNow[0]) {
+                	System.out.println("OK2");
                     analyzeField.get(i).add(corNow[1] + 1, item);
                 } else {
                     analyzeField.get(i).add(corNow[1] + 1, null);
@@ -200,7 +204,7 @@ public class LabAnalyzer {
     
     private static LabItem labItemSum(LabItem item1, LabItem item2)
     {
-        LabItem sum = new LabItem("2");
+        LabItem sum = new LabItem("10");
         if(!item1.toForward.isNothingAboutWallHere())
         {
             sum.toForward.setWallIsHere(item1.toForward.isWallIsHere());
@@ -381,22 +385,34 @@ public class LabAnalyzer {
     /**
      * Метод {@code outField} выводит просканируемый лабиринт
      */
+    
+   public static PrintWriter out;
+    static {
+    	try{
+    		out = new PrintWriter(new File("lab.txt"));
+    	}
+    	catch (Exception e){
+    	
+    	}
+    }
 
     public static void outField() {
+    	 
         for (int j = analyzeField.get(0).size() - 1; j >= 0; j--) {
             for (int i = 0; i < analyzeField.size(); i++) {
                 if (analyzeField.get(i).get(j) != null) {
-                    System.out.print(analyzeField.get(i).get(j).toString() + "[" + i + "][" + j + "]");
+                    out.print(analyzeField.get(i).get(j).toString() + "[" + i + "][" + j + "]");
                 } else {
-                    System.out.print("n" + "[" + i + "][" + j + "]");
+                    out.print("n" + "[" + i + "][" + j + "]");
                 }
                 if (corNow[0] == i && corNow[1] == j) {
-                    System.out.print("!");
+                    out.print("!");
                 }
-                System.out.print(" ");
+                out.print(" ");
             }
-            System.out.println();
+            out.println();
         }
+        out.println("/////////////////////////////////////////////////////////////");
     }
 
     /**

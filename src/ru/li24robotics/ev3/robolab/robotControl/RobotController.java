@@ -23,7 +23,7 @@ public class RobotController implements IRobotController{
 	private int perfectRotationAngle = 0;
 	private boolean isWallBack;
 	private final Double CHECK_LENGHT = 0.3;
-	private final Double WHEEL_CIRCUM = 2 * 0.028 * Math.PI;
+	private final Double WHEEL_CIRCUM = 2 * 0.027 * Math.PI;
 	private final int MAX_SPEED = 720;
 	private final int ACCELERATION = 360;
 	private final int MAX_ROTATE_ACCELERATION = 720;
@@ -32,10 +32,11 @@ public class RobotController implements IRobotController{
 	private final int TO_BACK_DEGREES = 180;
 	private final int MAX_ROTATE_SPEED = MAX_SPEED * 3;
 	private final int MIN_ROTATE_SPEED = 1;
-	private final int COLIBRATE_DISTANCE_ROTATION_ANGLE = 180;
+	private final int COLIBRATE_DISTANCE_ROTATION_ANGLE = 160;
+	private final int COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE = -160;
 	private final int DELAY_COLIBRATE_ROTATE = 1000;
-	private final int COLIBRATE_ROTATE_FORWARD_DEGREES = 70;
-	private final float MIN_VALUE_SIDE_COLIBRATE = 0.03f;
+	private final int COLIBRATE_ROTATE_FORWARD_DEGREES = 80;
+	private final float MIN_VALUE_SIDE_COLIBRATE = 0.04f;
 	private final float FORWARD_COLIBRATE_VALUE = 0.05f;
 	
 	
@@ -103,7 +104,6 @@ public class RobotController implements IRobotController{
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
     		int _nowSpeed = (int)((float) MAX_ROTATE_SPEED / Math.abs(TO_RIGHT_DEGREES * 0.5 - Math.abs(_nowDegrees - _startDegrees)));
-    		System.out.println(_nowDegrees);
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		
@@ -143,7 +143,6 @@ public class RobotController implements IRobotController{
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
     		int _nowSpeed = (int)((float) MAX_ROTATE_SPEED / Math.abs(TO_LEFT_DEGREES * 0.5 - Math.abs(_nowDegrees - _startDegrees)));
-    		System.out.println(_nowDegrees);
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		
@@ -197,7 +196,6 @@ public class RobotController implements IRobotController{
     		motor_r.endSynchronization();
     		motor_r.waitComplete();
         	motor_l.waitComplete();
-    		System.out.print("STOP!!!!");
     		motor_r.setSpeed(0);
     		motor_l.setSpeed(0);
     		
@@ -268,7 +266,7 @@ public class RobotController implements IRobotController{
     
     private boolean checkRightColibrate()
     {
-    	if(!isWallNearRight())
+    	if(!isWallNearRight() || isWallNearForward())
     	{
     		return false;
     	}
@@ -276,6 +274,7 @@ public class RobotController implements IRobotController{
     	float [] _nowSample_l = new float[sonic_l.sampleSize()];
     	sonic_r.fetchSample(_nowSample_r, 0);
     	sonic_l.fetchSample(_nowSample_l, 0);
+    	System.out.println(_nowSample_r[0] + " r");
     	if(_nowSample_r[0] < MIN_VALUE_SIDE_COLIBRATE || (isWallNearLeft() && _nowSample_l[0] > MIN_VALUE_SIDE_COLIBRATE + 00.5))
     	{
     		_nowSample_r = null;
@@ -289,7 +288,7 @@ public class RobotController implements IRobotController{
     
     private boolean checkLeftColibrate()
     {
-    	if(!isWallNearLeft())
+    	if(!isWallNearLeft() || isWallNearForward())
     	{
     		return false;
     	}
@@ -297,6 +296,7 @@ public class RobotController implements IRobotController{
     	float [] _nowSample_l = new float[sonic_l.sampleSize()];
     	sonic_r.fetchSample(_nowSample_r, 0);
     	sonic_l.fetchSample(_nowSample_l, 0);
+    	System.out.println(_nowSample_l[0] + " l");
     	if(_nowSample_l[0] < MIN_VALUE_SIDE_COLIBRATE || (isWallNearLeft() && _nowSample_r[0] > MIN_VALUE_SIDE_COLIBRATE + 00.5))
     	{
     		_nowSample_l = null;
@@ -319,7 +319,7 @@ public class RobotController implements IRobotController{
     	motor_r.setSpeed(MAX_SPEED);
     	motor_l.setSpeed(MAX_SPEED); 
     	motor_r.startSynchronization();
-    	int _backToStart = (int)((float) Math.sin(COLIBRATE_DISTANCE_ROTATION_ANGLE * 0.3) * 335);
+    	int _backToStart = COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE;
     	System.out.println(_backToStart);
     	motor_r.rotate(_backToStart);
     	motor_l.rotate(_backToStart);
@@ -342,7 +342,7 @@ public class RobotController implements IRobotController{
     	motor_l.setSpeed(MAX_SPEED);
     	motor_r.setSpeed(MAX_SPEED); 
     	motor_r.startSynchronization();
-    	int _backToStart = (int)((float) Math.sin(COLIBRATE_DISTANCE_ROTATION_ANGLE * 0.3) * 335);
+    	int _backToStart = COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE;
     	System.out.println(_backToStart);
     	motor_r.rotate(_backToStart);
     	motor_l.rotate(_backToStart);
