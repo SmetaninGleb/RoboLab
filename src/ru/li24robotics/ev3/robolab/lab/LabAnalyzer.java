@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import lejos.utility.Delay;
+
 /**
  * Класс анализирует лабиринт, который видит робот, и хранит
  * его в статичном поле.
@@ -164,10 +166,8 @@ public class LabAnalyzer {
     public static void addItemToForward(LabItem item)
     {
         if (corNow[1] == analyzeField.get(corNow[0]).size() - 1) {
-        	System.out.println("OK");
             for (int i = 0; i < analyzeField.size(); i++) {
                 if (i == corNow[0]) {
-                	System.out.println("OK2");
                     analyzeField.get(i).add(corNow[1] + 1, item);
                 } else {
                     analyzeField.get(i).add(corNow[1] + 1, null);
@@ -197,6 +197,12 @@ public class LabAnalyzer {
         }
     }
 
+    public static void addItemToCurrent(LabItem item)
+    {
+    	LabItem _now = labItemSum(item, analyzeField.get(corNow[0]).get(corNow[1]));
+    	analyzeField.get(corNow[0]).set(corNow[1], _now);
+    }
+    
     public void setNowItem(LabItem item)
     {
     	analyzeField.get(corNow[0]).set(corNow[1], labItemSum(item, analyzeField.get(corNow[0]).get(corNow[1])));
@@ -204,6 +210,16 @@ public class LabAnalyzer {
     
     private static LabItem labItemSum(LabItem item1, LabItem item2)
     {
+    	if(item1 == null)
+    	{
+    		return item2;
+    				
+    	}
+    	if(item2 == null)
+    	{
+    		return item1;
+    				
+    	}
         LabItem sum = new LabItem("10");
         if(!item1.toForward.isNothingAboutWallHere())
         {
@@ -303,7 +319,15 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsNotRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(i).size(); j++) {
-                if (!analyzeField.get(i).get(j).equalsNotRotate(field.get(i + x).get(j + y))) {
+//            	System.out.println((i+x) + " " + (j+y));
+//            	System.out.println(x + " " + y);
+//            	System.out.println(field.get(i + x)==null);
+//            	System.out.println(field.get(i + x).get(j + y)==null);
+//            	System.out.println(analyzeField.get(i)==null);
+//            	System.out.println(analyzeField.get(i).get(j)==null);
+            	
+//             	Delay.msDelay(1000);
+                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsNotRotate(field.get(i + x).get(j + y))) {
                     return false;
                 }
             }
@@ -326,7 +350,7 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsRightRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
-                if (!analyzeField.get(i).get(j).equalsRightRotate(field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
+                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsRightRotate(field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
                     return false;
                 }
             }
@@ -349,7 +373,7 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsOverRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
-                if (!analyzeField.get(i).get(j).equalsOverRotated(field.get(x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))) {
+                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsOverRotated(field.get(x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))) {
                     return false;
                 }
             }
@@ -374,7 +398,7 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsLeftRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
-                if (!analyzeField.get(i).get(j).equalsLeftRotated(field.get(x + analyzeField.get(0).size() - j - 1).get(y + i))) {
+                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsLeftRotated(field.get(x + analyzeField.get(0).size() - j - 1).get(y + i))) {
                     return false;
                 }
             }
@@ -402,6 +426,55 @@ public class LabAnalyzer {
             for (int i = 0; i < analyzeField.size(); i++) {
                 if (analyzeField.get(i).get(j) != null) {
                     out.print(analyzeField.get(i).get(j).toString() + "[" + i + "][" + j + "]");
+                    LabItem now = analyzeField.get(i).get(j);
+                    if(now.toForward.isNothingAboutWallHere())
+                    {
+                    	out.print("f:? ");
+                    }
+                    else if(now.toForward.isWallIsHere())
+                    {
+                    	out.print("f:y ");
+                    }
+                    else if(!now.toForward.isWallIsHere())
+                    {
+                    	out.print("f:n ");
+                    }
+                    if(now.toRight.isNothingAboutWallHere())
+                    {
+                    	out.print("r:? ");
+                    }
+                    else if(now.toRight.isWallIsHere())
+                    {
+                    	out.print("r:y ");
+                    }
+                    else if(!now.toRight.isWallIsHere())
+                    {
+                    	out.print("r:n ");
+                    }
+                    if(now.toLeft.isNothingAboutWallHere())
+                    {
+                    	out.print("l:? ");
+                    }
+                    else if(now.toLeft.isWallIsHere())
+                    {
+                    	out.print("l:y ");
+                    }
+                    else if(!now.toLeft.isWallIsHere())
+                    {
+                    	out.print("l:n ");
+                    }
+                    if(now.toBack.isNothingAboutWallHere())
+                    {
+                    	out.print("b:? ");
+                    }
+                    else if(now.toBack.isWallIsHere())
+                    {
+                    	out.print("b:y ");
+                    }
+                    else if(!now.toBack.isWallIsHere())
+                    {
+                    	out.print("b:n ");
+                    }
                 } else {
                     out.print("n" + "[" + i + "][" + j + "]");
                 }

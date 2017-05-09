@@ -32,17 +32,16 @@ public class LabAnalyzeController {
 
     public int[] Analyze()
     {
-        buildLabAround_one();
-        
-        int i=0;
+        buildLabAround_one_first();
+        LabAnalyzer.outField();
+        int i = 0;
         while(!isKnowCoordinates())
         {
         	i++;
-        	LabAnalyzer.outField();
         	goNextIterationForOneCheck();
         	buildLabAround_one();
-            
-            if (i==2) LabAnalyzer.out.close();
+            LabAnalyzer.outField();
+            if(i == 4) LabAnalyzer.out.close();
         }
 
         takeCoordinates();
@@ -77,11 +76,30 @@ public class LabAnalyzeController {
     
     private void goNextIterationForOneCheck()
     {
-    	if(!controller.isWallNearForward())
+    	switch(turnDegreesParameter)
+    	{
+    		case 0:
+    			goNextIterationForOneCheck_0Degrees();
+    			break;
+    		case 90:
+    			goNextIterationForOneCheck_90Degrees();
+    			break;
+    		case 180:
+    			goNextIterationForOneCheck_180Degrees();
+    			break;
+    		case 270:
+    			goNextIterationForOneCheck_270Degrees();
+    			break;
+    	}
+    }
+    
+    private void goNextIterationForOneCheck_0Degrees()
+    {
+    	if(!lookForward())
     	{
     		goToForward();
     	}
-    	else if(!controller.isWallNearLeft() && !controller.isWallNearRight())
+    	else if(!lookLeft() && !lookRight())
     	{
     		int _randPoint;
     		final Random _rand = new Random();
@@ -94,17 +112,122 @@ public class LabAnalyzeController {
     			goToLeft();
     		}
     	}
-    	else if(!controller.isWallNearRight())
+    	else if(!lookRight())
     	{
     		goToRight();
     	}
-    	else if(!controller.isWallNearLeft())
+    	else if(!lookLeft())
     	{
     		goToLeft();
     	}
-    	else if(!controller.isWallNearBack())
+    	else if(!lookBack())
     	{
     		goToBack();
+    	}
+    	else {
+    		System.out.println("Я в ***ном тупике, с*ки!");
+    	}
+    }
+    private void goNextIterationForOneCheck_90Degrees()
+    {
+    	if(!lookRight())
+    	{
+    		goToRight();
+    	}
+    	else if(!lookForward() && !lookBack())
+    	{
+    		int _randPoint;
+    		final Random _rand = new Random();
+    		_randPoint = _rand.nextInt(1);
+    		if(_randPoint == 0)
+    		{
+    			goToForward();
+    		}
+    		else {
+    			goToBack();
+    		}
+    	}
+    	else if(!lookForward())
+    	{
+    		goToForward();
+    	}
+    	else if(!lookBack())
+    	{
+    		goToBack();
+    	}
+    	else if(!lookLeft())
+    	{
+    		goToLeft();
+    	}
+    	else {
+    		System.out.println("Я в ***ном тупике, с*ки!");
+    	}
+    }
+    private void goNextIterationForOneCheck_180Degrees()
+    {
+    	if(!lookBack())
+    	{
+    		goToBack();
+    	}
+    	else if(!lookLeft() && !lookRight())
+    	{
+    		int _randPoint;
+    		final Random _rand = new Random();
+    		_randPoint = _rand.nextInt(1);
+    		if(_randPoint == 0)
+    		{
+    			goToRight();
+    		}
+    		else {
+    			goToLeft();
+    		}
+    	}
+    	else if(!lookRight())
+    	{
+    		goToRight();
+    	}
+    	else if(!lookLeft())
+    	{
+    		goToLeft();
+    	}
+    	else if(!lookForward())
+    	{
+    		goToForward();
+    	}
+    	else {
+    		System.out.println("Я в ***ном тупике, с*ки!");
+    	}
+    }
+    private void goNextIterationForOneCheck_270Degrees()
+    {
+    	if(!lookLeft())
+    	{
+    		goToLeft();
+    	}
+    	else if(!lookForward() && !lookBack())
+    	{
+    		int _randPoint;
+    		final Random _rand = new Random();
+    		_randPoint = _rand.nextInt(1);
+    		if(_randPoint == 0)
+    		{
+    			goToForward();
+    		}
+    		else {
+    			goToBack();
+    		}
+    	}
+    	else if(!lookForward())
+    	{
+    		goToForward();
+    	}
+    	else if(!lookBack())
+    	{
+    		goToBack();
+    	}
+    	else if(!lookRight())
+    	{
+    		goToRight();
     	}
     	else {
     		System.out.println("Я в ***ном тупике, с*ки!");
@@ -299,6 +422,13 @@ public class LabAnalyzeController {
         buildLabAtLeft();
     }
     
+    private void buildLabAround_one_first()
+    {
+    	buildOneAtForward();
+    	buildOneAtRight();
+    	buildOneAtLeft();    	
+    }
+    
     private void buildLabAround_one()
     {
     	buildOneAtForward();
@@ -361,10 +491,9 @@ public class LabAnalyzeController {
     {
     	LabItem _now = new LabItem("1");
     	_now.toForward.setWallIsHere(lookForward());
-    	System.out.println("Forward1");
+    	LabAnalyzer.addItemToCurrent(_now);
     	if(!lookForward())
     	{
-    		System.out.println("Forward2");
     		LabItem _nowForward = new LabItem("1");
     		_nowForward.toBack.setWallIsHere(false);
     		LabAnalyzer.addItemToForward(_nowForward);
@@ -375,7 +504,8 @@ public class LabAnalyzeController {
     {
     	LabItem _now = new LabItem("2");
     	_now.toRight.setWallIsHere(lookRight());
-    	if(!lookForward())
+    	LabAnalyzer.addItemToCurrent(_now);
+    	if(!lookRight())
     	{
     		LabItem _nowRight = new LabItem("1");
     		_nowRight.toLeft.setWallIsHere(false);
@@ -387,6 +517,7 @@ public class LabAnalyzeController {
     {
     	LabItem _now = new LabItem("3");
     	_now.toLeft.setWallIsHere(lookLeft());
+    	LabAnalyzer.addItemToCurrent(_now);
     	if(!lookLeft())
     	{
     		LabItem _nowLeft= new LabItem("1");
@@ -399,6 +530,7 @@ public class LabAnalyzeController {
     {
     	LabItem _now = new LabItem("4");
     	_now.toBack.setWallIsHere(lookBack());
+    	LabAnalyzer.addItemToCurrent(_now);
     	if(!lookBack())
     	{
     		LabItem _nowBack = new LabItem("1");

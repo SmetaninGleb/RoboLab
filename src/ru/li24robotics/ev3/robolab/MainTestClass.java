@@ -27,21 +27,38 @@ public class MainTestClass {
 	{
 		RobotController c = new RobotController(MotorPort.A, MotorPort.D, LocalEV3.get().getPort("S1"),
 				LocalEV3.get().getPort("S2"), LocalEV3.get().getPort("S4"), LocalEV3.get().getPort("S3"));
-		LabAnalyzer.InitLabAnalyzer(new LabItem("1"));
-		LabAnalyzeController lc = null;
-		try {
-			LabFileParser.InitLabFileParser();
-			lc = new LabAnalyzeController(LabFileParser.getMainLab(), c);
-		} 
-		catch(IOException e) {
-			
-		}
-		catch (ClassNotFoundException e) {
-			
-		}
-		int[] ans = lc.Analyze();
-		System.out.println("Analyzed!!!");
-		Delay.msDelay(5000);
-		System.out.println(ans[0] + " " + ans[1] + " " + ans[2]);
+//		LabAnalyzer.InitLabAnalyzer(new LabItem("1"));
+//		LabAnalyzeController lc = null;
+//		try {
+//			LabFileParser.InitLabFileParser();
+//			lc = new LabAnalyzeController(LabFileParser.getMainLab(), c);
+//		} 
+//		catch(IOException e) {
+//			
+//		}
+//		catch (ClassNotFoundException e) {
+//			
+//		}
+//		int[] ans = lc.Analyze();
+//		System.out.println("Analyzed!!!");
+//		System.out.println(ans[0] + " " + ans[1] + " " + ans[2]);
+//		Delay.msDelay(5000);
+//		LabAnalyzer.out.close();
+		c.forwardForChecks(1);
+		c.turnLeft();
+		c.forwardForChecks(1);
+		c.turnLeft();
+		c.forwardForChecks(1);
+		c.turnRight();
+		c.forwardForChecks(1);
+		c.turnLeft();
+		c.forwardForChecks(1);
+		c.turnLeft();
+		c.forwardForChecks(1);
+		c.forwardForChecks(1);
+		c.turnRight();
+		c.forwardForChecks(1);
+		c.turnRight();
+		c.turnRight();
 	}
 }
