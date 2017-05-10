@@ -1,9 +1,10 @@
 package ru.li24robotics.ev3.robolab.cubeFinder;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Route {
+public class Route implements Serializable{
     private ArrayList<RouteIteration> routeList;
     private int nowIterationNumber;
 
@@ -19,9 +20,14 @@ public class Route {
         nowIterationNumber = 0;
     }
 
-    public void addRouteIteration(RouteIteration iteration)
+    public void addRouteIterationToEnd(RouteIteration iteration)
     {
         routeList.add(iteration);
+    }
+
+    public void addRouteIterationToStart(RouteIteration iteration)
+    {
+        routeList.add(0, iteration);
     }
 
     public int getRouteSize ()
