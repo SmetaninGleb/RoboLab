@@ -33,15 +33,10 @@ public class LabAnalyzeController {
     public int[] Analyze()
     {
         buildLabAround_one_first();
-        LabAnalyzer.outField();
-        int i = 0;
         while(!isKnowCoordinates())
         {
-        	i++;
         	goNextIterationForOneCheck();
         	buildLabAround_one();
-            LabAnalyzer.outField();
-            if(i == 4) LabAnalyzer.out.close();
         }
 
         takeCoordinates();
