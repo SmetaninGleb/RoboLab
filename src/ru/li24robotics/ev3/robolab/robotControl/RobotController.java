@@ -39,7 +39,7 @@ public class RobotController implements IRobotController{
 	private final int DELAY_COLIBRATE_ROTATE = 500;
 	private final int COLIBRATE_ROTATE_FORWARD_DEGREES = 80;
 	private final float MIN_VALUE_SIDE_COLIBRATE = 0.04f;
-	private final float FORWARD_COLIBRATE_VALUE = 0.04f;
+	private final float FORWARD_COLIBRATE_VALUE = 0.05f;
 	private final float PERFECT_SIDE_COLIBRATION_DISTACE = 0.073f;
 	
 	public RobotController(Port motorPort_r, Port motorPort_l, Port sonicPort_r, Port sonicPort_f,
@@ -182,8 +182,49 @@ public class RobotController implements IRobotController{
 
     @Override
     public void turnBack() {
-    	turnRight();
-    	turnRight();
+    	isWallBack = isWallNearRight();
+    	float[] _nowSample = new float[gyro.sampleSize()];
+    	gyro.fetchSample(_nowSample, 0);
+    	int _nowDegrees = (int)_nowSample[0];
+    	int _startDegrees = perfectRotationAngle;
+    	
+    	motor_r.setSpeed(MIN_ROTATE_SPEED);
+    	motor_l.setSpeed(MIN_ROTATE_SPEED);
+    	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
+    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
+//    	motor_r.startSynchronization();
+    	motor_r.forward();
+    	motor_l.backward();
+//    	motor_r.endSynchronization();
+    	
+    	
+    	
+    	while(Math.abs(_nowDegrees - _startDegrees) < TO_BACK_DEGREES)
+    	{
+    		
+    		gyro.fetchSample(_nowSample, 0);
+    		_nowDegrees = (int)_nowSample[0];
+    		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_BACK_DEGREES / 2) * (TO_BACK_DEGREES / 2))) * 
+    				((Math.abs(_nowDegrees - _startDegrees) - (TO_BACK_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
+    						(TO_BACK_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
+    		System.out.println(_nowSpeed);
+    		motor_r.setSpeed(_nowSpeed);
+    		motor_l.setSpeed(_nowSpeed);
+    		
+    	}
+//    	motor_r.startSynchronization();
+    	motor_r.stop(true);
+    	motor_l.stop(true);
+//    	motor_r.endSynchronization();
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
+//    	motor_l.setSpeed(0);
+//    	motor_r.setSpeed(0);
+    	motor_l.setAcceleration(ACCELERATION);
+    	motor_r.setAcceleration(ACCELERATION);
+    	perfectRotationAngle += TO_LEFT_DEGREES;
+    	_nowSample = null;
+    	colibrateRotate();
     }
     
     private void colibrateRotate()

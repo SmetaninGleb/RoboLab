@@ -5,6 +5,8 @@ import java.io.IOException;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.port.MotorPort;
 import lejos.utility.Delay;
+import ru.li24robotics.ev3.robolab.cubeFinder.RouteFileParser;
+import ru.li24robotics.ev3.robolab.cubeFinder.RouteFollower;
 import ru.li24robotics.ev3.robolab.lab.LabAnalyzeController;
 import ru.li24robotics.ev3.robolab.lab.LabAnalyzer;
 import ru.li24robotics.ev3.robolab.lab.LabFileParser;
@@ -20,19 +22,15 @@ public class MainTestClass {
 		
 		LabAnalyzer.InitLabAnalyzer(new LabItem("1"));
 		LabAnalyzeController lc = null;
-		try {
-			LabFileParser.InitLabFileParser();
-			lc = new LabAnalyzeController(LabFileParser.getMainLab(), c);
-		} 
-		catch(IOException e) {
-			
-		}
-		catch (ClassNotFoundException e) {
-			
-		}
+		LabFileParser.InitLabFileParser();
+		lc = new LabAnalyzeController(LabFileParser.getMainLab(), c);
 		int[] ans = lc.Analyze();
 		System.out.println("Analyzed!!!");
 		System.out.println(ans[0] + " " + ans[1] + " " + ans[2]);
+//		RouteFollower rf = new RouteFollower(c);
+//		rf.setMainRoute(new RouteFileParser().getRouteFromStartCors(ans));
+//		rf.setStartRobotRotation_degrees(ans[2]);
+//		rf.followRoute();
 		Delay.msDelay(5000);
 		LabAnalyzer.out.close();
 //		c.turnBack();

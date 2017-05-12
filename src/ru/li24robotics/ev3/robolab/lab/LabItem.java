@@ -48,9 +48,9 @@ public class LabItem implements Serializable {
      * @return
      */
     public boolean equalsNotRotate(LabItem item) {
-        if (this.isCubeHere != item.isCubeHere) {
-            return false;
-        }
+//        if (this.isCubeHere != item.isCubeHere) {
+//            return false;
+//        }
         if (this.toBack.equals(item.toBack)
                 && this.toForward.equals(item.toForward)
                 && this.toLeft.equals(item.toLeft)
@@ -62,9 +62,9 @@ public class LabItem implements Serializable {
     }
 
     public boolean equalsRightRotate(LabItem item) {
-        if (this.isCubeHere != item.isCubeHere) {
-            return false;
-        }
+//        if (this.isCubeHere != item.isCubeHere) {
+//            return false;
+//        }
         if (this.toBack.equals(item.toLeft)
                 && this.toForward.equals(item.toRight)
                 && this.toLeft.equals(item.toForward)
@@ -76,9 +76,9 @@ public class LabItem implements Serializable {
     }
 
     public boolean equalsOverRotated(LabItem item) {
-        if (this.isCubeHere != item.isCubeHere) {
-            return false;
-        }
+//        if (this.isCubeHere != item.isCubeHere) {
+//            return false;
+//        }
         if (this.toBack.equals(item.toForward)
                 && this.toForward.equals(item.toBack)
                 && this.toLeft.equals(item.toRight)
@@ -90,9 +90,9 @@ public class LabItem implements Serializable {
     }
 
     public boolean equalsLeftRotated(LabItem item) {
-        if (this.isCubeHere != item.isCubeHere) {
-            return false;
-        }
+//        if (this.isCubeHere != item.isCubeHere) {
+//            return false;
+//        }
         if (this.toBack.equals(item.toRight)
                 && this.toForward.equals(item.toLeft)
                 && this.toLeft.equals(item.toBack)

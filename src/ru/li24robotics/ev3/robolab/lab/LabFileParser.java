@@ -18,14 +18,26 @@ public class LabFileParser {
     private static ObjectInputStream objectInputStream;
 
 
-    public static void InitLabFileParser() throws IOException {
-        fileInputStream = new FileInputStream("MainLab.out");
-        objectInputStream = new ObjectInputStream(fileInputStream);
+    public static void InitLabFileParser()
+    {
+    	try {
+    		fileInputStream = new FileInputStream("MainLab.out");
+    		objectInputStream = new ObjectInputStream(fileInputStream);
+    	} catch(Exception e) {
+    		System.err.println("No MainLab.out File!!!");
+    		fileInputStream = null;
+    		objectInputStream = null;
+    	}
     }
 
 
-    public static ArrayList<ArrayList<LabItem>> getMainLab() throws IOException, ClassNotFoundException {
+    public static ArrayList<ArrayList<LabItem>> getMainLab() {
+    	try {
         ArrayList<ArrayList<LabItem>> mainLab = (ArrayList<ArrayList<LabItem>>) objectInputStream.readObject();
         return mainLab;
+    	}catch(Exception e){
+    		System.err.println("Cannot read object from MainLab.out file!!!");
+    		return null;
+    	}
     }
 }
