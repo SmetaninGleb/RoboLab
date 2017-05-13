@@ -36,7 +36,7 @@ public class LabWall implements Serializable {
     @Override
     public boolean equals(Object obj) {
         LabWall wall = (LabWall) obj;
-        if (this.NothingAboutWallHere == true) {
+        if (this.NothingAboutWallHere == true || wall.NothingAboutWallHere == true) {
             return true;
         }
 

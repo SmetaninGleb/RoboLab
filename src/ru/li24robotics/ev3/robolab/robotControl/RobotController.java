@@ -28,8 +28,10 @@ public class RobotController implements IRobotController{
 	private final int MAX_SPEED = 720;
 	private final int ACCELERATION = 720;
 	private final int MAX_ROTATE_ACCELERATION = 720;
-	private final int TO_RIGHT_DEGREES = 90;
-	private final int TO_LEFT_DEGREES = 90;
+	private final int TO_RIGHT_DEGREES = 87;
+	private final int TO_LEFT_DEGREES = 87;
+	private final int TO_LEFT_DEGREES_PERFECT = 90;
+	private final int TO_RIGHT_DEGREES_PERFECT = 90;
 	private final int TO_BACK_DEGREES = 180;
 	private final int MAX_ROTATE_SPEED = 300;
 	private final int MIN_ROTATE_SPEED = 1;
@@ -38,9 +40,11 @@ public class RobotController implements IRobotController{
 	private final int START_ROTATE_SPEED = 30;
 	private final int DELAY_COLIBRATE_ROTATE = 500;
 	private final int COLIBRATE_ROTATE_FORWARD_DEGREES = 80;
+	private final int ERROR_DELAY = 100;
 	private final float MIN_VALUE_SIDE_COLIBRATE = 0.04f;
 	private final float FORWARD_COLIBRATE_VALUE = 0.05f;
 	private final float PERFECT_SIDE_COLIBRATION_DISTACE = 0.073f;
+	private final float CHECK_NEAR_WALL_DISTANCE = 0.13f;
 	
 	public RobotController(Port motorPort_r, Port motorPort_l, Port sonicPort_r, Port sonicPort_f,
 			Port sonicPort_l, Port gyroPort)
@@ -74,8 +78,13 @@ public class RobotController implements IRobotController{
     	motor_l.setSpeed(MAX_SPEED);
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
+    	Delay.msDelay(ERROR_DELAY);
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
+//    	motor_r.startSynchronization();
     	motor_r.rotate((int)_allDegrees, true);
     	motor_l.rotate((int)_allDegrees, true);
+//    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	isWallBack = false;
@@ -89,6 +98,7 @@ public class RobotController implements IRobotController{
 
     @Override
     public void turnRight() {
+    	Delay.msDelay(ERROR_DELAY);
     	isWallBack = isWallNearLeft();
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
@@ -98,6 +108,9 @@ public class RobotController implements IRobotController{
     	motor_l.setSpeed(MIN_ROTATE_SPEED);
     	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
     	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
+    	Delay.msDelay(ERROR_DELAY);
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
 //    	motor_r.startSynchronization();
     	motor_r.backward();
     	motor_l.forward();
@@ -110,7 +123,6 @@ public class RobotController implements IRobotController{
     				((Math.abs(_nowDegrees - _startDegrees) - (TO_RIGHT_DEGREES / 2)) * 
     						(Math.abs(_nowDegrees - _startDegrees) - (TO_RIGHT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + 
     				START_ROTATE_SPEED;
-    		System.out.println(_nowSpeed);
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		
@@ -129,6 +141,7 @@ public class RobotController implements IRobotController{
     	_nowSample = null;
     	
     	colibrateRotate();
+    	colibrateDistance();
     }
 
     @Override
@@ -144,7 +157,12 @@ public class RobotController implements IRobotController{
     	motor_l.setSpeed(MIN_ROTATE_SPEED);
     	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
     	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
+    	Delay.msDelay(ERROR_DELAY); 
 //    	motor_r.startSynchronization();
+
+   	
     	motor_r.forward();
     	motor_l.backward();
 //    	motor_r.endSynchronization();
@@ -159,7 +177,6 @@ public class RobotController implements IRobotController{
     		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_LEFT_DEGREES / 2) * (TO_LEFT_DEGREES / 2))) * 
     				((Math.abs(_nowDegrees - _startDegrees) - (TO_LEFT_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
     						(TO_LEFT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
-    		System.out.println(_nowSpeed);
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		
@@ -172,16 +189,17 @@ public class RobotController implements IRobotController{
     	motor_l.waitComplete();
 //    	motor_l.setSpeed(0);
 //    	motor_r.setSpeed(0);
-    	motor_l.setAcceleration(ACCELERATION);
-    	motor_r.setAcceleration(ACCELERATION);
-    	perfectRotationAngle += TO_LEFT_DEGREES;
+//    	motor_l.setAcceleration(ACCELERATION);
+//    	motor_r.setAcceleration(ACCELERATION);
+    	perfectRotationAngle += TO_LEFT_DEGREES_PERFECT;
     	_nowSample = null;
     	colibrateRotate();
-    	
+    	colibrateDistance();    	
     }
 
     @Override
     public void turnBack() {
+    	Delay.msDelay(ERROR_DELAY);
     	isWallBack = isWallNearRight();
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
@@ -192,6 +210,9 @@ public class RobotController implements IRobotController{
     	motor_l.setSpeed(MIN_ROTATE_SPEED);
     	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
     	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
+    	Delay.msDelay(ERROR_DELAY);
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
 //    	motor_r.startSynchronization();
     	motor_r.forward();
     	motor_l.backward();
@@ -207,7 +228,6 @@ public class RobotController implements IRobotController{
     		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_BACK_DEGREES / 2) * (TO_BACK_DEGREES / 2))) * 
     				((Math.abs(_nowDegrees - _startDegrees) - (TO_BACK_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
     						(TO_BACK_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
-    		System.out.println(_nowSpeed);
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		
@@ -220,21 +240,25 @@ public class RobotController implements IRobotController{
     	motor_l.waitComplete();
 //    	motor_l.setSpeed(0);
 //    	motor_r.setSpeed(0);
-    	motor_l.setAcceleration(ACCELERATION);
-    	motor_r.setAcceleration(ACCELERATION);
-    	perfectRotationAngle += TO_LEFT_DEGREES;
+//    	motor_l.setAcceleration(ACCELERATION);
+//    	motor_r.setAcceleration(ACCELERATION);
+    	perfectRotationAngle += TO_LEFT_DEGREES_PERFECT;
     	_nowSample = null;
     	colibrateRotate();
     }
     
     private void colibrateRotate()
     {
+    	Delay.msDelay(ERROR_DELAY);
     	if(isWallBack)
     	{
     		motor_r.setSpeed(MAX_SPEED);
     		motor_l.setSpeed(MAX_SPEED);
     		motor_l.setAcceleration(ACCELERATION);
     		motor_r.setAcceleration(ACCELERATION);
+        	Delay.msDelay(ERROR_DELAY);
+        	motor_r.waitComplete();
+        	motor_l.waitComplete();
 //    		motor_r.startSynchronization();
     		motor_r.backward();
     		motor_l.backward();
@@ -257,14 +281,15 @@ public class RobotController implements IRobotController{
 //    		motor_r.endSynchronization();
     		motor_r.waitComplete();
         	motor_l.waitComplete();
-    		motor_r.setSpeed(0);
-    		motor_l.setSpeed(0);
+//    		motor_r.setSpeed(0);
+//    		motor_l.setSpeed(0);
     		
     	}
     }
     
     private void colibrateDistance()
     {
+    	Delay.msDelay(ERROR_DELAY);
     	if(checkRightColibrate())
     	{
     		colibrateOverRightSide();
@@ -273,64 +298,77 @@ public class RobotController implements IRobotController{
     	{
     		colibrateOverLeftSide();
     	}
-    	colibrateForward();
+    	//colibrateForward();
     }
     
     private void colibrateForward()
     {
-    	if(!isWallNearForward())
+    	if(checksCountToWallAtForward() > 0)
     	{
     		return;
     	}
-    	float [] _nowSample = new float[sonic_f.sampleSize()];
-    	sonic_f.fetchSample(_nowSample, 0);
-    	if(_nowSample[0] < FORWARD_COLIBRATE_VALUE)
-    	{
-    		motor_r.setSpeed(MAX_SPEED);
-        	motor_l.setSpeed(MAX_SPEED);
-//        	motor_r.startSynchronization();
-        	motor_r.backward();
-        	motor_l.backward();
-//        	motor_r.endSynchronization();
-    		while(_nowSample[0] < FORWARD_COLIBRATE_VALUE)
-    		{
-    			sonic_f.fetchSample(_nowSample, 0);
-    		}
-//    		motor_r.startSynchronization();
-        	motor_r.stop(true);
-        	motor_l.stop(true);
-//        	motor_r.endSynchronization();
-        	motor_r.waitComplete();
-        	motor_l.waitComplete();
-        	motor_l.setSpeed(0);
-        	motor_r.setSpeed(0);
-    	}
-    	else if(_nowSample[0] > FORWARD_COLIBRATE_VALUE)
-    	{
-    		motor_r.setSpeed(MAX_SPEED);
-        	motor_l.setSpeed(MAX_SPEED);
-//        	motor_r.startSynchronization();
-        	motor_r.forward();
-        	motor_l.forward();
-//        	motor_r.endSynchronization();
-    		while(_nowSample[0] > FORWARD_COLIBRATE_VALUE)
-    		{
-    			sonic_f.fetchSample(_nowSample, 0);    			
-    		}
-//    		motor_r.startSynchronization();
-        	motor_r.stop(true);
-        	motor_l.stop(true);
-//        	motor_r.endSynchronization();
-        	motor_r.waitComplete();
-        	motor_l.waitComplete();
-    		motor_l.setSpeed(0);
-        	motor_r.setSpeed(0);        	
-    	}
-    	_nowSample = null;
+    	
+    	motor_l.forward();
+    	motor_r.forward();
+    	
+    	Delay.msDelay(1000);
+    	
+    	motor_r.stop(true);
+    	motor_l.stop(true);
+//    	Delay.msDelay(ERROR_DELAY);
+//    	if(!isWallNearForward())
+//    	{
+//    		return;
+//    	}
+//    	float [] _nowSample = new float[sonic_f.sampleSize()];
+//    	sonic_f.fetchSample(_nowSample, 0);
+//    	if(_nowSample[0] < FORWARD_COLIBRATE_VALUE)
+//    	{
+//    		motor_r.setSpeed(MAX_SPEED);
+//        	motor_l.setSpeed(MAX_SPEED);
+////        	motor_r.startSynchronization();
+//        	motor_r.backward();
+//        	motor_l.backward();
+////        	motor_r.endSynchronization();
+//    		while(_nowSample[0] < FORWARD_COLIBRATE_VALUE)
+//    		{
+//    			sonic_f.fetchSample(_nowSample, 0);
+//    		}
+////    		motor_r.startSynchronization();
+//        	motor_r.stop(true);
+//        	motor_l.stop(true);
+////        	motor_r.endSynchronization();
+//        	motor_r.waitComplete();
+//        	motor_l.waitComplete();
+////        	motor_l.setSpeed(0);
+////        	motor_r.setSpeed(0);
+//    	}
+//    	else if(_nowSample[0] > FORWARD_COLIBRATE_VALUE)
+//    	{
+//    		motor_r.setSpeed(MAX_SPEED);
+//        	motor_l.setSpeed(MAX_SPEED);
+////        	motor_r.startSynchronization();
+//        	motor_r.forward();
+//        	motor_l.forward();
+////        	motor_r.endSynchronization();
+//    		while(_nowSample[0] > FORWARD_COLIBRATE_VALUE)
+//    		{
+//    			sonic_f.fetchSample(_nowSample, 0);    			
+//    		}
+////    		motor_r.startSynchronization();
+//        	motor_r.stop(true);
+//        	motor_l.stop(true);
+////        	motor_r.endSynchronization();
+//        	motor_r.waitComplete();
+//        	motor_l.waitComplete();
+////    		motor_l.setSpeed(0);
+////        	motor_r.setSpeed(0);        	
+//    	}
+//    	_nowSample = null;
     }
     
     private boolean checkRightColibrate()
-    {
+    {    	
     	if(!isWallNearRight() || isWallNearForward())
     	{
     		return false;
@@ -360,6 +398,9 @@ public class RobotController implements IRobotController{
     	float [] _nowSample_l = new float[sonic_l.sampleSize()];
     	sonic_r.fetchSample(_nowSample_r, 0);
     	sonic_l.fetchSample(_nowSample_l, 0);
+    	System.out.println(_nowSample_l[0] + "l");
+    	System.out.println(_nowSample_r[0] + "r");
+    	Delay.msDelay(1000);
     	if(_nowSample_l[0] < MIN_VALUE_SIDE_COLIBRATE || (isWallNearLeft() && _nowSample_r[0] > MIN_VALUE_SIDE_COLIBRATE + PERFECT_SIDE_COLIBRATION_DISTACE))
     	{
     		_nowSample_l = null;
@@ -381,15 +422,18 @@ public class RobotController implements IRobotController{
     	motor_l.setSpeed(0);
     	motor_r.setSpeed(MAX_SPEED);
     	motor_l.setSpeed(MAX_SPEED); 
-//    	motor_r.startSynchronization();
     	int _backToStart = COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE;
+    	Delay.msDelay(ERROR_DELAY);
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
+//    	motor_r.startSynchronization();
     	motor_r.rotate(_backToStart, true);
     	motor_l.rotate(_backToStart, true);
 //    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
-    	motor_r.setSpeed(0);
-    	motor_l.setSpeed(0);
+//    	motor_r.setSpeed(0);
+//    	motor_l.setSpeed(0);
     	
     }
     
@@ -403,15 +447,18 @@ public class RobotController implements IRobotController{
     	motor_r.setSpeed(0);
     	motor_l.setSpeed(MAX_SPEED);
     	motor_r.setSpeed(MAX_SPEED); 
-//    	motor_r.startSynchronization();
     	int _backToStart = COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE;
+    	Delay.msDelay(ERROR_DELAY);
+    	motor_r.waitComplete();
+    	motor_l.waitComplete();
+//    	motor_r.startSynchronization();
     	motor_r.rotate(_backToStart, true);
     	motor_l.rotate(_backToStart, true);
 //    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
-    	motor_r.setSpeed(0);
-    	motor_l.setSpeed(0);
+//    	motor_r.setSpeed(0);
+//    	motor_l.setSpeed(0);
     }
     
     @Override
@@ -426,17 +473,29 @@ public class RobotController implements IRobotController{
 
     @Override
     public boolean isWallNearLeft() {
-        return checksCountToWallAtLeft() == 0;
+    	float _distance;
+    	float[] _nowSample = new float[sonic_l.sampleSize()];
+    	sonic_l.fetchSample(_nowSample, 0);
+    	_distance = _nowSample[0];
+        return _distance < CHECK_NEAR_WALL_DISTANCE;
     }
 
     @Override
     public boolean isWallNearForward() {
-        return checksCountToWallAtForward() == 0;
+    	float _distance;
+    	float[] _nowSample = new float[sonic_f.sampleSize()];
+    	sonic_f.fetchSample(_nowSample, 0);
+    	_distance = _nowSample[0];
+        return _distance < CHECK_NEAR_WALL_DISTANCE;
     }
 
     @Override
     public boolean isWallNearRight() {
-        return checksCountToWallAtRight() == 0;
+    	float _distance;
+    	float[] _nowSample = new float[sonic_r.sampleSize()];
+    	sonic_r.fetchSample(_nowSample, 0);
+    	_distance = _nowSample[0];
+        return _distance < CHECK_NEAR_WALL_DISTANCE;
     }
 
     @Override

@@ -287,7 +287,7 @@ public class LabAnalyzer {
 
         for (int i = 0; i < potentialCorOnMainField.size(); i++) {
             for (int j = 0; j < potentialCorOnMainField.size(); j++) {
-                if (potentialCorOnMainField.get(i)[0] == potentialCorOnMainField.get(j)[0] && potentialCorOnMainField.get(i)[1] == potentialCorOnMainField.get(j)[1] && i != j) {
+                if (potentialCorOnMainField.get(i)[0] == potentialCorOnMainField.get(j)[0] && potentialCorOnMainField.get(i)[1] == potentialCorOnMainField.get(j)[1] && i != j && potentialCorOnMainField.get(i)[2] == potentialCorOnMainField.get(j)[2]) {
                     potentialCorOnMainField.remove(j);
                 }
             }
@@ -351,7 +351,7 @@ public class LabAnalyzer {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
                 if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsRightRotate(field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
-                    return false;
+                	return false;
                 }
             }
         }

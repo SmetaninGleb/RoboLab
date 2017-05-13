@@ -54,22 +54,23 @@ public class RouteFollower
 		}
 		
 		ArrayList<RouteIteration> _nowRouteList = mainRoute.getRouteList();
-		
+		System.out.println("Start Following!!!");
+		System.out.println("Start Degrees : " + robotRotation_degrees);
 		for(int i = 0; i < mainRoute.getRouteSize(); i++)
 		{
-			if(_nowRouteList.get(i).getType() == "ToRight")
+			if(_nowRouteList.get(i).getType().equals("ToRight"))
 			{
 				toRight((int)_nowRouteList.get(i).getValue());
 			}
-			if(_nowRouteList.get(i).getType() == "Forward")
+			if(_nowRouteList.get(i).getType().equals("Forward"))
 			{
 				toForward((int)_nowRouteList.get(i).getValue());
 			}
-			if(_nowRouteList.get(i).getType() == "ToLeft")
+			if(_nowRouteList.get(i).getType().equals("ToLeft"))
 			{
 				toLeft((int)_nowRouteList.get(i).getValue());
 			}
-			if(_nowRouteList.get(i).getType() == "Backward")
+			if(_nowRouteList.get(i).getType().equals("Backward"))
 			{
 				toBack((int)_nowRouteList.get(i).getValue());
 			}
