@@ -90,11 +90,11 @@ public class LabAnalyzeController {
     
     private void goNextIterationForOneCheck_0Degrees()
     {
-    	if(!lookForward())
+    	if(!lookForward() && !LabAnalyzer.wasAtForward())
     	{
     		goToForward();
     	}
-    	else if(!lookLeft() && !lookRight())
+    	else if(!lookLeft() && !lookRight() && !LabAnalyzer.wasAtLeft() && !LabAnalyzer.wasAtRight())
     	{
     		int _randPoint;
     		final Random _rand = new Random();
@@ -107,29 +107,66 @@ public class LabAnalyzeController {
     			goToLeft();
     		}
     	}
-    	else if(!lookRight())
+    	else if(!lookRight() && !LabAnalyzer.wasAtRight())
     	{
     		goToRight();
     	}
-    	else if(!lookLeft())
+    	else if(!lookLeft() && !LabAnalyzer.wasAtLeft())
     	{
     		goToLeft();
     	}
-    	else if(!lookBack())
+    	else if(!lookBack() && !LabAnalyzer.wasAtBack())
     	{
     		goToBack();
     	}
     	else {
-    		System.out.println("Я в ***ном тупике, с*ки!");
+            goNextIterationForOneCheckRobotWas_0Degrees();
     	}
     }
+
+    private void goNextIterationForOneCheckRobotWas_0Degrees()
+    {
+        if(!lookForward())
+        {
+            goToForward();
+        }
+        else if(!lookLeft() && !lookRight())
+        {
+            int _randPoint;
+            final Random _rand = new Random();
+            _randPoint = _rand.nextInt(2);
+            if(_randPoint == 0)
+            {
+                goToRight();
+            }
+            else {
+                goToLeft();
+            }
+        }
+        else if(!lookRight())
+        {
+            goToRight();
+        }
+        else if(!lookLeft())
+        {
+            goToLeft();
+        }
+        else if(!lookBack())
+        {
+            goToBack();
+        }
+        else {
+            System.out.println("Я в ***ном тупике, с*ки!");
+        }
+    }
+
     private void goNextIterationForOneCheck_90Degrees()
     {
-    	if(!lookRight())
+    	if(!lookRight() && !LabAnalyzer.wasAtForward())
     	{
     		goToRight();
     	}
-    	else if(!lookForward() && !lookBack())
+    	else if(!lookForward() && !lookBack() && !LabAnalyzer.wasAtForward() && !LabAnalyzer.wasAtBack())
     	{
     		int _randPoint;
     		final Random _rand = new Random();
@@ -142,29 +179,66 @@ public class LabAnalyzeController {
     			goToBack();
     		}
     	}
-    	else if(!lookForward())
+    	else if(!lookForward() && !LabAnalyzer.wasAtForward())
     	{
     		goToForward();
     	}
-    	else if(!lookBack())
+    	else if(!lookBack() && !LabAnalyzer.wasAtBack())
     	{
     		goToBack();
     	}
-    	else if(!lookLeft())
+    	else if(!lookLeft() && !LabAnalyzer.wasAtLeft())
     	{
     		goToLeft();
     	}
     	else {
-    		System.out.println("Я в ***ном тупике, с*ки!");
+            goNextIterationForOneCheckRobotWas_90Degrees();
     	}
     }
+
+    private void goNextIterationForOneCheckRobotWas_90Degrees()
+    {
+        if(!lookRight())
+        {
+            goToRight();
+        }
+        else if(!lookForward() && !lookBack())
+        {
+            int _randPoint;
+            final Random _rand = new Random();
+            _randPoint = _rand.nextInt(2);
+            if(_randPoint == 0)
+            {
+                goToForward();
+            }
+            else {
+                goToBack();
+            }
+        }
+        else if(!lookForward())
+        {
+            goToForward();
+        }
+        else if(!lookBack())
+        {
+            goToBack();
+        }
+        else if(!lookLeft())
+        {
+            goToLeft();
+        }
+        else {
+            System.out.println("Я в ***ном тупике, с*ки!");
+        }
+    }
+
     private void goNextIterationForOneCheck_180Degrees()
     {
-    	if(!lookBack())
+    	if(!lookBack() && !LabAnalyzer.wasAtBack())
     	{
     		goToBack();
     	}
-    	else if(!lookLeft() && !lookRight())
+    	else if(!lookLeft() && !lookRight() && !LabAnalyzer.wasAtLeft() && !LabAnalyzer.wasAtRight())
     	{
     		int _randPoint;
     		final Random _rand = new Random();
@@ -177,29 +251,66 @@ public class LabAnalyzeController {
     			goToLeft();
     		}
     	}
-    	else if(!lookRight())
+    	else if(!lookRight() && !LabAnalyzer.wasAtRight())
     	{
     		goToRight();
     	}
-    	else if(!lookLeft())
+    	else if(!lookLeft() && !LabAnalyzer.wasAtLeft())
     	{
     		goToLeft();
     	}
-    	else if(!lookForward())
+    	else if(!lookForward() && !LabAnalyzer.wasAtForward())
     	{
     		goToForward();
     	}
     	else {
-    		System.out.println("Я в ***ном тупике, с*ки!");
+            goNextIterationForOneCheckRobotWas_180Degrees();
     	}
     }
+
+    private void goNextIterationForOneCheckRobotWas_180Degrees()
+    {
+        if(!lookBack())
+        {
+            goToBack();
+        }
+        else if(!lookLeft() && !lookRight())
+        {
+            int _randPoint;
+            final Random _rand = new Random();
+            _randPoint = _rand.nextInt(2);
+            if(_randPoint == 0)
+            {
+                goToRight();
+            }
+            else {
+                goToLeft();
+            }
+        }
+        else if(!lookRight())
+        {
+            goToRight();
+        }
+        else if(!lookLeft())
+        {
+            goToLeft();
+        }
+        else if(!lookForward())
+        {
+            goToForward();
+        }
+        else {
+            System.out.println("Я в ***ном тупике, с*ки!");
+        }
+    }
+
     private void goNextIterationForOneCheck_270Degrees()
     {
-    	if(!lookLeft())
+    	if(!lookLeft() && !LabAnalyzer.wasAtLeft())
     	{
     		goToLeft();
     	}
-    	else if(!lookForward() && !lookBack())
+    	else if(!lookForward() && !lookBack() && !LabAnalyzer.wasAtForward() && !LabAnalyzer.wasAtBack())
     	{
     		int _randPoint;
     		final Random _rand = new Random();
@@ -212,21 +323,57 @@ public class LabAnalyzeController {
     			goToBack();
     		}
     	}
-    	else if(!lookForward())
+    	else if(!lookForward() && !LabAnalyzer.wasAtForward())
     	{
     		goToForward();
     	}
-    	else if(!lookBack())
+    	else if(!lookBack() && !LabAnalyzer.wasAtBack())
     	{
     		goToBack();
     	}
-    	else if(!lookRight())
+    	else if(!lookRight() && !LabAnalyzer.wasAtRight())
     	{
     		goToRight();
     	}
     	else {
-    		System.out.println("Я в ***ном тупике, с*ки!");
+            goNextIterationForOneCheckRobotWas_270Degrees();
     	}
+    }
+
+    private void goNextIterationForOneCheckRobotWas_270Degrees()
+    {
+        if(!lookLeft())
+        {
+            goToLeft();
+        }
+        else if(!lookForward() && !lookBack())
+        {
+            int _randPoint;
+            final Random _rand = new Random();
+            _randPoint = _rand.nextInt(2);
+            if(_randPoint == 0)
+            {
+                goToForward();
+            }
+            else {
+                goToBack();
+            }
+        }
+        else if(!lookForward())
+        {
+            goToForward();
+        }
+        else if(!lookBack())
+        {
+            goToBack();
+        }
+        else if(!lookRight())
+        {
+            goToRight();
+        }
+        else {
+            System.out.println("Я в ***ном тупике, с*ки!");
+        }
     }
 
     private void goForwardToWall()

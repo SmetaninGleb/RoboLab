@@ -1,7 +1,5 @@
 package ru.li24robotics.ev3.robolab.robotControl;
 
-import javax.swing.text.DefaultEditorKit.BeepAction;
-
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
@@ -26,7 +24,7 @@ public class RobotController implements IRobotController{
 	private SampleProvider sonic_l;
 	private int perfectRotationAngle = 0;
 	private boolean isWallBack;
-	private final Double CHECK_LENGHT = 0.3;
+	private final Double CHECK_LENGTH = 0.3;
 	private final Double WHEEL_CIRCUM = 2 * 0.027 * Math.PI;
 	private final int MAX_SPEED = 720;
 	private final int ACCELERATION = 720;
@@ -75,8 +73,8 @@ public class RobotController implements IRobotController{
     @Override
     public void forwardForChecks(int countCheck) 
     {
-    	double _allLenght = CHECK_LENGHT * (double)countCheck;
-    	double _allDegrees = _allLenght / WHEEL_CIRCUM * 360;
+    	double _allLength = CHECK_LENGTH * (double)countCheck;
+    	double _allDegrees = _allLength / WHEEL_CIRCUM * 360;
     	motor_r.setSpeed(MAX_SPEED);
     	motor_l.setSpeed(MAX_SPEED);
     	motor_r.setAcceleration(ACCELERATION);
@@ -520,7 +518,7 @@ public class RobotController implements IRobotController{
         float[] _sample = new float[sonic_l.sampleSize()];
         sonic_l.fetchSample(_sample, 0);
         _distance = (double)_sample[0];
-        _count = (int)(_distance / CHECK_LENGHT);
+        _count = (int)(_distance / CHECK_LENGTH);
     	return _count;
     }
 
@@ -531,7 +529,7 @@ public class RobotController implements IRobotController{
         float[] _sample = new float[sonic_r.sampleSize()];
         sonic_r.fetchSample(_sample, 0);
         _distance = (double)_sample[0];
-        _count = (int)(_distance / CHECK_LENGHT);
+        _count = (int)(_distance / CHECK_LENGTH);
     	return _count;
     }
 
@@ -551,7 +549,7 @@ public class RobotController implements IRobotController{
         float[] _sample = new float[sonic_f.sampleSize()];
         sonic_f.fetchSample(_sample, 0);
         _distance = (double)_sample[0];
-        _count = (int)(_distance / CHECK_LENGHT);
+        _count = (int)(_distance / CHECK_LENGTH);
     	return _count;
     }
 }
