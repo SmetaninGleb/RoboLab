@@ -98,7 +98,7 @@ public class LabAnalyzeController {
     	{
     		int _randPoint;
     		final Random _rand = new Random();
-    		_randPoint = _rand.nextInt(1);
+    		_randPoint = _rand.nextInt(2);
     		if(_randPoint == 0)
     		{
     			goToRight();
@@ -133,7 +133,7 @@ public class LabAnalyzeController {
     	{
     		int _randPoint;
     		final Random _rand = new Random();
-    		_randPoint = _rand.nextInt(1);
+    		_randPoint = _rand.nextInt(2);
     		if(_randPoint == 0)
     		{
     			goToForward();
@@ -168,7 +168,7 @@ public class LabAnalyzeController {
     	{
     		int _randPoint;
     		final Random _rand = new Random();
-    		_randPoint = _rand.nextInt(1);
+    		_randPoint = _rand.nextInt(2);
     		if(_randPoint == 0)
     		{
     			goToRight();
@@ -203,7 +203,7 @@ public class LabAnalyzeController {
     	{
     		int _randPoint;
     		final Random _rand = new Random();
-    		_randPoint = _rand.nextInt(1);
+    		_randPoint = _rand.nextInt(2);
     		if(_randPoint == 0)
     		{
     			goToForward();

@@ -3,7 +3,9 @@ package ru.li24robotics.ev3.robolab;
 import java.io.IOException;
 
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.MotorPort;
+import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
 import ru.li24robotics.ev3.robolab.cubeFinder.RouteFileParser;
 import ru.li24robotics.ev3.robolab.cubeFinder.RouteFollower;
@@ -29,13 +31,19 @@ public class MainTestClass {
 		System.out.println(ans[0] + " " + ans[1] + " " + ans[2]);
 		LabAnalyzer.outField();
 		RouteFollower rf = new RouteFollower(c);
-		RouteFileParser rfp = new RouteFileParser();
-		System.out.println(rfp.getRouteFromStartCors(ans).getRouteSize());
-		rf.setMainRoute(rfp.getRouteFromStartCors(ans));
+		System.out.println(RouteFileParser.getRouteFromStartCors(ans).getRouteSize());
+		rf.setMainRoute(RouteFileParser.getRouteFromStartCors(ans));
 		rf.setStartRobotRotation_degrees(ans[2]);
 		rf.followRoute();
 		Delay.msDelay(10000);
 		LabAnalyzer.out.close();
+		
+//		RegulatedMotor m = new EV3LargeRegulatedMotor(MotorPort.D);
+//		m.setSpeed(100);
+//		m.forward();
+//		Delay.msDelay(5000);
+//		
+		
 //		c.turnBack();
 //		c.forwardForChecks(1);
 //		c.turnLeft();

@@ -45,6 +45,7 @@ public class LabAnalyzer {
             addItemToForward(new LabItem("2"));
         }
         corNow[1]++;
+        analyzeField.get(corNow[0]).get(corNow[1]).wasRobotHere = true;
     }
 
     public static void putRobotToBack()
@@ -53,6 +54,7 @@ public class LabAnalyzer {
             addItemToBack(new LabItem("2"));
         }
         corNow[1]--;
+        analyzeField.get(corNow[0]).get(corNow[1]).wasRobotHere = true;
     }
 
     public static void putRobotToRight()
@@ -61,6 +63,7 @@ public class LabAnalyzer {
             addItemToRight(new LabItem("2"));
         }
         corNow[0]++;
+        analyzeField.get(corNow[0]).get(corNow[1]).wasRobotHere = true;
     }
 
     public static void putRobotToLeft()
@@ -69,6 +72,7 @@ public class LabAnalyzer {
             addItemToLeft(new LabItem("2"));
         }
         corNow[0]--;
+        analyzeField.get(corNow[0]).get(corNow[1]).wasRobotHere = true;
     }
 
     public static boolean isItemAtForward()
@@ -405,7 +409,43 @@ public class LabAnalyzer {
         }
         return true;
     }
-
+    
+    public static boolean wasAtForward()
+    {
+    	if(corNow[1] == analyzeField.get(corNow[0]).size() - 1 || analyzeField.get(corNow[0]).get(corNow[1] + 1) == null)
+    	{
+    		return false;
+    	}
+    	return analyzeField.get(corNow[0]).get(corNow[1] + 1).wasRobotHere;
+    }
+    
+    public static boolean wasAtRight()
+    {
+    	if(corNow[0] == analyzeField.size() - 1 || analyzeField.get(corNow[0] + 1).get(corNow[1]) == null)
+    	{
+    		return false;
+    	}
+    	return analyzeField.get(corNow[0] + 1).get(corNow[1]).wasRobotHere;
+    }
+    
+    public static boolean wasAtLeft()
+    {
+    	if(corNow[0] == 0 || analyzeField.get(corNow[0] - 1).get(corNow[1]) == null)
+    	{
+    		return false;
+    	}
+    	return analyzeField.get(corNow[0] - 1).get(corNow[1]).wasRobotHere;
+    }
+    
+    public static boolean wasAtBack()
+    {
+    	if(corNow[1] == 0 || analyzeField.get(corNow[0]).get(corNow[1] - 1) == null)
+    	{
+    		return false;
+    	}
+    	return analyzeField.get(corNow[0]).get(corNow[1] - 1).wasRobotHere;
+    }
+    
     /**
      * Метод {@code outField} выводит просканируемый лабиринт
      */

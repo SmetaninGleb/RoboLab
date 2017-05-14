@@ -33,8 +33,8 @@ public class LabFileParser {
 
     public static ArrayList<ArrayList<LabItem>> getMainLab() {
     	try {
-        ArrayList<ArrayList<LabItem>> mainLab = (ArrayList<ArrayList<LabItem>>) objectInputStream.readObject();
-        return mainLab;
+	        ArrayList<ArrayList<LabItem>> mainLab = (ArrayList<ArrayList<LabItem>>) objectInputStream.readObject();
+	        return mainLab;
     	}catch(Exception e){
     		System.err.println("Cannot read object from MainLab.out file!!!");
     		return null;

@@ -22,6 +22,8 @@ public class LabItem implements Serializable {
     public LabWall toLeft;
     public LabWall toForward;
     public boolean isCubeHere;
+    public boolean wasRobotHere;
+    
     //for debug!
     //TODO delete key
     private String key;
@@ -37,6 +39,7 @@ public class LabItem implements Serializable {
         this.toForward = new LabWall();
         this.toRight = new LabWall();
         this.toLeft = new LabWall();
+        this.wasRobotHere = false;
     }
 
 
