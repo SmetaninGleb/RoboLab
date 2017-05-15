@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import lejos.utility.Delay;
 
 /**
  * Класс анализирует лабиринт, который видит робот, и хранит
@@ -31,6 +30,7 @@ public class LabAnalyzer {
     {
         analyzeField = new ArrayList<ArrayList<LabItem>>();
         analyzeField.add(new ArrayList<LabItem>());
+        startItem.wasRobotHere = true;
         analyzeField.get(0).add(startItem);
     }
 
@@ -272,6 +272,7 @@ public class LabAnalyzer {
         else {
             sum.toBack.setNothingAboutWallHere(true);
         }
+        sum.wasRobotHere = item1.wasRobotHere || item2.wasRobotHere;
 
         return sum;
     }
@@ -322,15 +323,8 @@ public class LabAnalyzer {
 
     private static boolean equalsPartsOfFieldsNotRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
-            for (int j = 0; j < analyzeField.get(i).size(); j++) {
-//            	System.out.println((i+x) + " " + (j+y));
-//            	System.out.println(x + " " + y);
-//            	System.out.println(field.get(i + x)==null);
-//            	System.out.println(field.get(i + x).get(j + y)==null);
-//            	System.out.println(analyzeField.get(i)==null);
-//            	System.out.println(analyzeField.get(i).get(j)==null);
-            	
-//             	Delay.msDelay(1000);
+            for (int j = 0; j < analyzeField.get(i).size(); j++)
+            {
                 if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsNotRotate(field.get(i + x).get(j + y))) {
                     return false;
                 }
@@ -412,7 +406,8 @@ public class LabAnalyzer {
     
     public static boolean wasAtForward()
     {
-    	if(corNow[1] == analyzeField.get(corNow[0]).size() - 1 || analyzeField.get(corNow[0]).get(corNow[1] + 1) == null)
+    	if(corNow[1] == analyzeField.get(corNow[0]).size() - 1
+                || analyzeField.get(corNow[0]).get(corNow[1] + 1) == null)
     	{
     		return false;
     	}
@@ -514,6 +509,13 @@ public class LabAnalyzer {
                     else if(!now.toBack.isWallIsHere())
                     {
                     	out.print("b:n ");
+                    }
+                    if (now.wasRobotHere)
+                    {
+                        out.print("+");
+                    }
+                    else {
+                        out.print("-");
                     }
                 } else {
                     out.print("n" + "[" + i + "][" + j + "]");

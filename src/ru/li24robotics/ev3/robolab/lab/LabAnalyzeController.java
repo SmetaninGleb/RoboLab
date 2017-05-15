@@ -1,12 +1,13 @@
 package ru.li24robotics.ev3.robolab.lab;
 
 
+import lejos.hardware.Sound;
 import ru.li24robotics.ev3.robolab.robotControl.IRobotController;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import lejos.utility.Delay;
+
 
 
 /**
@@ -162,7 +163,7 @@ public class LabAnalyzeController {
 
     private void goNextIterationForOneCheck_90Degrees()
     {
-    	if(!lookRight() && !LabAnalyzer.wasAtForward())
+    	if(!lookRight() && !LabAnalyzer.wasAtRight())
     	{
     		goToRight();
     	}
@@ -264,6 +265,7 @@ public class LabAnalyzeController {
     		goToForward();
     	}
     	else {
+
             goNextIterationForOneCheckRobotWas_180Degrees();
     	}
     }

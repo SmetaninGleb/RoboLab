@@ -1,6 +1,7 @@
 package ru.li24robotics.ev3.robolab.robotControl;
 
 import lejos.hardware.Sound;
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3GyroSensor;
@@ -34,11 +35,13 @@ public class RobotController implements IRobotController{
 	private final int TO_LEFT_DEGREES_PERFECT = 90;
 	private final int TO_RIGHT_DEGREES_PERFECT = 90;
 	private final int TO_BACK_DEGREES = 180;
-	private final int MAX_ROTATE_SPEED = 450*5;
+	private final int MAX_ROTATE_SPEED_BACK = 450;
+	private final int MAX_ROTATE_SPEED_RIGHT = 300;
+	private final int MAX_ROTATE_SPEED_LEFT = 300;
 	private final int MIN_ROTATE_SPEED = 1;
 	private final int COLIBRATE_DISTANCE_ROTATION_ANGLE = 160;
 	private final int COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE = -160;
-	private final int START_ROTATE_SPEED = 10;
+	private final int START_ROTATE_SPEED = 20;
 	private final int DELAY_COLIBRATE_ROTATE = 500;
 	private final int COLIBRATE_ROTATE_FORWARD_DEGREES = 80;
 	private final int ERROR_DELAY = 0;
@@ -122,8 +125,9 @@ public class RobotController implements IRobotController{
 //    				((Math.abs(_nowDegrees - _startDegrees) - (TO_RIGHT_DEGREES / 2)) * 
 //    						(Math.abs(_nowDegrees - _startDegrees) - (TO_RIGHT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + 
 //    				START_ROTATE_SPEED;
-    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_RIGHT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
-    		System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n");
+//    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_RIGHT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
+    		int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES * Math.PI) * MAX_ROTATE_SPEED_RIGHT + START_ROTATE_SPEED);
+			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES + " div\n");
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		motor_r.backward();
@@ -174,8 +178,9 @@ public class RobotController implements IRobotController{
 //    		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_LEFT_DEGREES / 2) * (TO_LEFT_DEGREES / 2))) * 
 //    				((Math.abs(_nowDegrees - _startDegrees) - (TO_LEFT_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
 //    						(TO_LEFT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
-    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_LEFT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
-    		System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n");
+//    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_LEFT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
+			int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES * Math.PI) * MAX_ROTATE_SPEED_LEFT + START_ROTATE_SPEED);
+			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES + " div\n");
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		motor_r.forward();
@@ -197,7 +202,7 @@ public class RobotController implements IRobotController{
 //    	motor_r.setAcceleration(ACCELERATION);
     	perfectRotationAngle += TO_LEFT_DEGREES_PERFECT;
     	_nowSample = null;
-    	colibrateRotate(); 	
+    	colibrateRotate();
     }
 
     @Override
@@ -232,8 +237,10 @@ public class RobotController implements IRobotController{
 //    		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_BACK_DEGREES / 2) * (TO_BACK_DEGREES / 2))) * 
 //    				((Math.abs(_nowDegrees - _startDegrees) - (TO_BACK_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
 //    						(TO_BACK_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
-    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_BACK_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
-    		System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n");
+//    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_BACK_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
+			int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES * Math.PI) * MAX_ROTATE_SPEED_BACK + START_ROTATE_SPEED);
+			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES + " div\n");
+
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		motor_r.forward();
@@ -552,4 +559,20 @@ public class RobotController implements IRobotController{
         _count = (int)(_distance / CHECK_LENGTH);
     	return _count;
     }
+
+    public void showStatus()
+	{
+		float[] _nowSampleGyro = new float[gyro.sampleSize()];
+		float[] _nowSampleSonic_r = new float[sonic_r.sampleSize()];
+		float[] _nowSampleSonic_f = new float[sonic_f.sampleSize()];
+		float[] _nowSampleSonic_l = new float[sonic_l.sampleSize()];
+		gyro.fetchSample(_nowSampleGyro, 0);
+		sonic_l.fetchSample(_nowSampleSonic_l, 0);
+		sonic_f.fetchSample(_nowSampleSonic_f, 0);
+		sonic_r.fetchSample(_nowSampleSonic_r, 0);
+		LCD.drawString("GYRO: " + _nowSampleGyro[0], 0, 0);
+		LCD.drawString("SONIC_R: " + _nowSampleSonic_r[0], 0, 1);
+		LCD.drawString("SONIC_F: " + _nowSampleSonic_f[0], 0, 2);
+		LCD.drawString("SONIC_L: " + _nowSampleSonic_l[0], 0, 3);
+	}
 }

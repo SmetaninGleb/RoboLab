@@ -2,7 +2,6 @@ package ru.li24robotics.ev3.robolab.cubeFinder;
 
 import java.util.ArrayList;
 
-import lejos.utility.Delay;
 import ru.li24robotics.ev3.robolab.robotControl.RobotController;
 
 /**
@@ -55,32 +54,24 @@ public class RouteFollower
 		}
 		
 		ArrayList<RouteIteration> _nowRouteList = mainRoute.getRouteList();
-		System.out.println("Start Following!!!");
-		System.out.println("Start Degrees : " + robotRotation_degrees);
-		Delay.msDelay(1000);
 		for(int i = 0; i < mainRoute.getRouteSize(); i++)
 		{
 			System.out.println(robotRotation_degrees);
 			System.out.println(_nowRouteList.get(i).getType());
-			Delay.msDelay(1000);
 			if(_nowRouteList.get(i).getType().equals("ToRight"))
 			{
-				System.out.println("Moving Right...");
 				toRight((int)_nowRouteList.get(i).getValue());
 			}
 			if(_nowRouteList.get(i).getType().equals("Forward"))
 			{
-				System.out.println("Moving Forward...");
 				toForward((int)_nowRouteList.get(i).getValue());
 			}
 			if(_nowRouteList.get(i).getType().equals("ToLeft"))
 			{
-				System.out.println("Moving Left...");
 				toLeft((int)_nowRouteList.get(i).getValue());
 			}
 			if(_nowRouteList.get(i).getType().equals("Backward"))
 			{
-				System.out.println("Moving Backward...");
 				toBack((int)_nowRouteList.get(i).getValue());
 			}
 		}
