@@ -30,8 +30,14 @@ public class RobotMainAlgorithmController
             robotController.showStatus();
             Delay.msDelay(200);
         }
+//        for (int i = 0; i < 5; i++)
+//        {
+//            robotController.forwardForChecks(1);
+//        }
         LCD.clear();
         analyzedCoordinates = labAnalyzeController.Analyze();
+        LCD.drawString("ANALYZED!!!" , 0, 0);
+        LCD.drawString(analyzedCoordinates[0] + " " + analyzedCoordinates[1] + " " + analyzedCoordinates[2], 0, 1);
         routeFollower.setMainRoute(RouteFileParser.getRouteFromStartCors(analyzedCoordinates));
         routeFollower.setStartRobotRotation_degrees(analyzedCoordinates[2]);
         routeFollower.followRoute();

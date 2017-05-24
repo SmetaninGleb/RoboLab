@@ -49,15 +49,15 @@ public class RouteFollower
 	{
 		if(mainRoute == null)
 		{
-			System.err.println("No main route in RouteFollower!!!");
+			//System.err.println("No main route in RouteFollower!!!");
 			return;
 		}
 		
 		ArrayList<RouteIteration> _nowRouteList = mainRoute.getRouteList();
 		for(int i = 0; i < mainRoute.getRouteSize(); i++)
 		{
-			System.out.println(robotRotation_degrees);
-			System.out.println(_nowRouteList.get(i).getType());
+			//System.out.println(robotRotation_degrees);
+			//System.out.println(_nowRouteList.get(i).getType());
 			if(_nowRouteList.get(i).getType().equals("ToRight"))
 			{
 				toRight((int)_nowRouteList.get(i).getValue());
@@ -167,7 +167,7 @@ public class RouteFollower
 	
 	private void turnRobotRight()
 	{
-		System.out.println("Turning right");
+		//System.out.println("Turning right");
 		controller.turnRight();
 		robotRotation_degrees += 90;
 		robotRotation_degrees %= 360;
@@ -175,7 +175,7 @@ public class RouteFollower
 	
 	private void turnRobotLeft()
 	{
-		System.out.println("Turning left");
+		//System.out.println("Turning left");
 		controller.turnLeft();
 		robotRotation_degrees += 270;
 		robotRotation_degrees %= 360;
@@ -183,7 +183,7 @@ public class RouteFollower
 	
 	private void turnRobotBack()
 	{
-		System.out.println("Turning back");
+		//System.out.println("Turning back");
 		controller.turnBack();
 		robotRotation_degrees += 180;
 		robotRotation_degrees %= 360;

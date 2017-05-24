@@ -27,8 +27,8 @@ public class RobotController implements IRobotController{
 	private boolean isWallBack;
 	private final Double CHECK_LENGTH = 0.3;
 	private final Double WHEEL_CIRCUM = 2 * 0.027 * Math.PI;
-	private final int MAX_SPEED = 720;
-	private final int ACCELERATION = 720;
+	private final int MAX_SPEED = 1440;
+	private final int ACCELERATION = 1080;
 	private final int MAX_ROTATE_ACCELERATION = 720 * 3;
 	private final int TO_RIGHT_DEGREES = 90;
 	private final int TO_LEFT_DEGREES = 90;
@@ -36,8 +36,8 @@ public class RobotController implements IRobotController{
 	private final int TO_RIGHT_DEGREES_PERFECT = 90;
 	private final int TO_BACK_DEGREES = 180;
 	private final int MAX_ROTATE_SPEED_BACK = 450;
-	private final int MAX_ROTATE_SPEED_RIGHT = 300;
-	private final int MAX_ROTATE_SPEED_LEFT = 300;
+	private final int MAX_ROTATE_SPEED_RIGHT = 350;
+	private final int MAX_ROTATE_SPEED_LEFT = 350;
 	private final int MIN_ROTATE_SPEED = 1;
 	private final int COLIBRATE_DISTANCE_ROTATION_ANGLE = 160;
 	private final int COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE = -160;
@@ -127,7 +127,7 @@ public class RobotController implements IRobotController{
 //    				START_ROTATE_SPEED;
 //    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_RIGHT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
     		int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES * Math.PI) * MAX_ROTATE_SPEED_RIGHT + START_ROTATE_SPEED);
-			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES + " div\n");
+		//	System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES + " div\n");
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		motor_r.backward();
@@ -180,7 +180,7 @@ public class RobotController implements IRobotController{
 //    						(TO_LEFT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
 //    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_LEFT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
 			int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES * Math.PI) * MAX_ROTATE_SPEED_LEFT + START_ROTATE_SPEED);
-			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES + " div\n");
+	//		System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES + " div\n");
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
     		motor_r.forward();
@@ -239,7 +239,7 @@ public class RobotController implements IRobotController{
 //    						(TO_BACK_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
 //    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_BACK_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
 			int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES * Math.PI) * MAX_ROTATE_SPEED_BACK + START_ROTATE_SPEED);
-			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES + " div\n");
+//			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES + " div\n");
 
     		motor_r.setSpeed(_nowSpeed);
     		motor_l.setSpeed(_nowSpeed);
