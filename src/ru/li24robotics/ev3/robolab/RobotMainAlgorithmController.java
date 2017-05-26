@@ -23,17 +23,13 @@ public class RobotMainAlgorithmController
 
     public static void main(String args[])
     {
-        Initialization();
+        Initialization();        
         while(!Button.ENTER.isDown())
         {
             LCD.clear();
             robotController.showStatus();
             Delay.msDelay(200);
         }
-//        for (int i = 0; i < 5; i++)
-//        {
-//            robotController.forwardForChecks(1);
-//        }
         LCD.clear();
         analyzedCoordinates = labAnalyzeController.Analyze();
         LCD.drawString("ANALYZED!!!" , 0, 0);

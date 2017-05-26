@@ -1,5 +1,7 @@
 package ru.li24robotics.ev3.robolab.robotControl;
 
+import java.util.Date;
+
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -10,9 +12,10 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
+import lejos.utility.Timer;
 
 
-public class RobotController implements IRobotController{
+public class RobotController implements IRobotController {
 	private RegulatedMotor motor_r;
 	private RegulatedMotor motor_l;
 	private SensorModes sonicSensor_r;
@@ -30,10 +33,8 @@ public class RobotController implements IRobotController{
 	private final int MAX_SPEED = 1440;
 	private final int ACCELERATION = 1080;
 	private final int MAX_ROTATE_ACCELERATION = 720 * 3;
-	private final int TO_RIGHT_DEGREES = 90;
 	private final int TO_LEFT_DEGREES = 90;
-	private final int TO_LEFT_DEGREES_PERFECT = 90;
-	private final int TO_RIGHT_DEGREES_PERFECT = 90;
+	private final int TO_RIGHT_DEGREES = 90;
 	private final int TO_BACK_DEGREES = 180;
 	private final int MAX_ROTATE_SPEED_BACK = 450;
 	private final int MAX_ROTATE_SPEED_RIGHT = 350;
@@ -49,6 +50,10 @@ public class RobotController implements IRobotController{
 	private final float FORWARD_COLIBRATE_VALUE = 0.05f;
 	private final float PERFECT_SIDE_COLIBRATION_DISTACE = 0.06f;
 	private final float CHECK_NEAR_WALL_DISTANCE = 0.13f;
+	private final float P_REGULATOR_ROTATION_COEF = 12f;
+	private final float D_REGULATOR_ROTATION_COEF = 35f;
+	private final long ROTATION_LEFT_RIGHT_TIME_MILLIS = 1200; // впритык - секунда(1000)
+	private final long ROTATION_BACK_TIME_MILLIS = 2400; // еще не проверялось
 	
 	public RobotController(Port motorPort_r, Port motorPort_l, Port sonicPort_r, Port sonicPort_f,
 			Port sonicPort_l, Port gyroPort)
@@ -104,104 +109,85 @@ public class RobotController implements IRobotController{
     public void turnRight() {
     	Delay.msDelay(ERROR_DELAY);
     	isWallBack = isWallNearLeft();
+		perfectRotationAngle -= TO_RIGHT_DEGREES;
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	int _startDegrees = perfectRotationAngle;
     	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
     	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
-//    	motor_l.setSpeed(0);
-//    	motor_r.setSpeed(0);
-//    	motor_r.waitComplete();
-//    	motor_l.waitComplete();
-//    	motor_r.startSynchronization();
-    	
-//    	motor_r.endSynchronization();
-    	while(Math.abs(_nowDegrees - _startDegrees) < TO_RIGHT_DEGREES)
+    	int _oldDRegulator = _nowDegrees;
+    	long _startRotateTime_millis = System.currentTimeMillis();
+    	long _nowRotateTime_millis = _startRotateTime_millis;
+    	while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_LEFT_RIGHT_TIME_MILLIS)
     	{
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
-//    		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_RIGHT_DEGREES / 2) * (TO_RIGHT_DEGREES / 2))) * 
-//    				((Math.abs(_nowDegrees - _startDegrees) - (TO_RIGHT_DEGREES / 2)) * 
-//    						(Math.abs(_nowDegrees - _startDegrees) - (TO_RIGHT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + 
-//    				START_ROTATE_SPEED;
-//    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_RIGHT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
-    		int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES * Math.PI) * MAX_ROTATE_SPEED_RIGHT + START_ROTATE_SPEED);
-		//	System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_RIGHT_DEGREES + " div\n");
-    		motor_r.setSpeed(_nowSpeed);
-    		motor_l.setSpeed(_nowSpeed);
-    		motor_r.backward();
-        	motor_l.forward();
-//    		Delay.msDelay(10);
+    		int _error = perfectRotationAngle - _nowDegrees;
+    		int _controllP = (int)(_error * P_REGULATOR_ROTATION_COEF);
+    		int _controllD = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_COEF));
+    		motor_l.setSpeed(Math.abs(_controllP + _controllD));
+    		motor_r.setSpeed(Math.abs(_controllP + _controllD));
+    		if(_controllP + _controllD < 0)
+			{
+				motor_r.backward();
+				motor_l.forward();
+			}
+			else {
+    			motor_r.forward();
+    			motor_l.backward();;
+			}
+    		_oldDRegulator = _nowDegrees;
+    		_nowRotateTime_millis = System.currentTimeMillis();
     	}
-//    	motor_r.startSynchronization();
     	motor_r.stop(true);
     	motor_l.stop(true);
-//    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
-//    	motor_l.setSpeed(0);
-//    	motor_r.setSpeed(0);
-//    	motor_l.setAcceleration(ACCELERATION);
-//    	motor_r.setAcceleration(ACCELERATION);
-    	perfectRotationAngle -= TO_RIGHT_DEGREES_PERFECT;
-    	_nowSample = null;
-    	
     	colibrateRotate();
     }
 
     @Override
     public void turnLeft() {
-    	Delay.msDelay(ERROR_DELAY); 
+    	Delay.msDelay(ERROR_DELAY);
     	isWallBack = isWallNearRight();
+		perfectRotationAngle -= TO_LEFT_DEGREES;
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	int _startDegrees = perfectRotationAngle;
+    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
     	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
-    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);    
-//    	motor_l.setSpeed(0);
-//    	motor_r.setSpeed(0);
-//    	motor_r.waitComplete();
-//    	motor_l.waitComplete();
-//    
-//    	motor_r.startSynchronization();
-    	
-//    	motor_r.endSynchronization();
-    	while(Math.abs(_nowDegrees - _startDegrees) < TO_LEFT_DEGREES)
+    	int _oldDRegulator = _nowDegrees;
+    	long _startRotateTime_millis = System.currentTimeMillis();
+    	long _nowRotateTime_millis = _startRotateTime_millis;
+    	while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_LEFT_RIGHT_TIME_MILLIS)
     	{
-    		
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
-//    		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_LEFT_DEGREES / 2) * (TO_LEFT_DEGREES / 2))) * 
-//    				((Math.abs(_nowDegrees - _startDegrees) - (TO_LEFT_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
-//    						(TO_LEFT_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
-//    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_LEFT_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
-			int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES * Math.PI) * MAX_ROTATE_SPEED_LEFT + START_ROTATE_SPEED);
-	//		System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_LEFT_DEGREES + " div\n");
-    		motor_r.setSpeed(_nowSpeed);
-    		motor_l.setSpeed(_nowSpeed);
-    		motor_r.forward();
-        	motor_l.backward();
-//    		Delay.msDelay(10);
-    		
+    		int _error = perfectRotationAngle - _nowDegrees;
+    		int _controllP = (int)(_error * P_REGULATOR_ROTATION_COEF);
+    		int _controllD = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_COEF));
+    		motor_l.setSpeed(Math.abs(_controllP + _controllD));
+    		motor_r.setSpeed(Math.abs(_controllP + _controllD));
+    		if(_controllP + _controllD < 0)
+			{
+				motor_r.forward();
+				motor_l.backward();
+			}
+			else {
+    			motor_r.backward();
+    			motor_l.forward();
+			}
+    		_oldDRegulator = _nowDegrees;
+    		_nowRotateTime_millis = System.currentTimeMillis();
     	}
-//    	motor_r.startSynchronization();
     	motor_r.stop(true);
     	motor_l.stop(true);
-//    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
-//    	motor_l.setSpeed(0);
-//    	motor_r.setSpeed(0);
-//    	motor_l.setAcceleration(ACCELERATION);
-//    	motor_r.setAcceleration(ACCELERATION);
-    	perfectRotationAngle += TO_LEFT_DEGREES_PERFECT;
-    	_nowSample = null;
     	colibrateRotate();
     }
 
@@ -209,59 +195,42 @@ public class RobotController implements IRobotController{
     public void turnBack() {
     	Delay.msDelay(ERROR_DELAY);
     	isWallBack = isWallNearForward();
+		perfectRotationAngle -= TO_BACK_DEGREES;
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	int _startDegrees = perfectRotationAngle;
-    	
+    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
     	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
-    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);    
-//    	motor_l.setSpeed(0);
-//    	motor_r.setSpeed(0);
-//    	motor_r.waitComplete();
-//    	motor_l.waitComplete();
-    
-//    	motor_r.waitComplete();
-//    	motor_l.waitComplete();
-//    	motor_r.startSynchronization();
-    	
-//    	motor_r.endSynchronization();
-    	
-    	
-    	
-    	while(Math.abs(_nowDegrees - _startDegrees) < TO_BACK_DEGREES)
+    	int _oldDRegulator = _nowDegrees;
+    	long _startRotateTime_millis = System.currentTimeMillis();
+    	long _nowRotateTime_millis = _startRotateTime_millis;
+    	while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_BACK_TIME_MILLIS)
     	{
-    		
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
-//    		int _nowSpeed = (int)((float) ((-1.0 * MAX_ROTATE_SPEED / ((TO_BACK_DEGREES / 2) * (TO_BACK_DEGREES / 2))) * 
-//    				((Math.abs(_nowDegrees - _startDegrees) - (TO_BACK_DEGREES / 2)) * (Math.abs(_nowDegrees - _startDegrees) - 
-//    						(TO_BACK_DEGREES / 2))) + MAX_ROTATE_SPEED)) + START_ROTATE_SPEED;
-//    		int _nowSpeed = (int)((float) 1.0 * MAX_ROTATE_SPEED / Math.abs(TO_BACK_DEGREES / 2 - Math.abs(_nowDegrees - _startDegrees)));
-			int _nowSpeed = (int)(Math.sin((double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES * Math.PI) * MAX_ROTATE_SPEED_BACK + START_ROTATE_SPEED);
-//			System.out.println(_nowDegrees + " deg\n" + _nowSpeed + " speed\n" + (double)(Math.abs(_nowDegrees - _startDegrees)) / TO_BACK_DEGREES + " div\n");
-
-    		motor_r.setSpeed(_nowSpeed);
-    		motor_l.setSpeed(_nowSpeed);
-    		motor_r.forward();
-        	motor_l.backward();
-//    		Delay.msDelay(10);
-    		
+    		int _error = perfectRotationAngle - _nowDegrees;
+    		int _controllP = (int)(_error * P_REGULATOR_ROTATION_COEF);
+    		int _controllD = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_COEF));
+    		motor_l.setSpeed(Math.abs(_controllP + _controllD));
+    		motor_r.setSpeed(Math.abs(_controllP + _controllD));
+    		if(_controllP + _controllD < 0)
+			{
+				motor_r.backward();
+				motor_l.forward();
+			}
+			else {
+    			motor_r.forward();
+    			motor_l.backward();;
+			}
+    		_oldDRegulator = _nowDegrees;
+    		_nowRotateTime_millis = System.currentTimeMillis();
     	}
-//    	motor_r.startSynchronization();
     	motor_r.stop(true);
     	motor_l.stop(true);
-//    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
-//    	motor_l.setSpeed(0);
-//    	motor_r.setSpeed(0);
-//    	motor_l.setAcceleration(ACCELERATION);
-//    	motor_r.setAcceleration(ACCELERATION);
-    	perfectRotationAngle += TO_BACK_DEGREES;
-    	_nowSample = null;
     	colibrateRotate();
     }
     

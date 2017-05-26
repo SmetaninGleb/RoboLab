@@ -2,4 +2,6 @@
 *.class
 .idea
 /bin/
+META-INF
+
 
