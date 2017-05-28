@@ -292,7 +292,9 @@ public class LabAnalyzer {
 
         for (int i = 0; i < potentialCorOnMainField.size(); i++) {
             for (int j = 0; j < potentialCorOnMainField.size(); j++) {
-                if (potentialCorOnMainField.get(i)[0] == potentialCorOnMainField.get(j)[0] && potentialCorOnMainField.get(i)[1] == potentialCorOnMainField.get(j)[1] && i != j && potentialCorOnMainField.get(i)[2] == potentialCorOnMainField.get(j)[2]) {
+                if (potentialCorOnMainField.get(i)[0] == potentialCorOnMainField.get(j)[0] &&
+                        potentialCorOnMainField.get(i)[1] == potentialCorOnMainField.get(j)[1] &&
+                        i != j && potentialCorOnMainField.get(i)[2] == potentialCorOnMainField.get(j)[2]) {
                     potentialCorOnMainField.remove(j);
                 }
             }
@@ -325,7 +327,8 @@ public class LabAnalyzer {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(i).size(); j++)
             {
-                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsNotRotate(field.get(i + x).get(j + y))) {
+                if (analyzeField.get(i).get(j) != null &&
+                        !analyzeField.get(i).get(j).equalsNotRotate(field.get(i + x).get(j + y))) {
                     return false;
                 }
             }
@@ -348,7 +351,9 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsRightRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
-                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsRightRotate(field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
+                if (analyzeField.get(i).get(j) != null &&
+                        !analyzeField.get(i).get(j).equalsRightRotate
+                                (field.get(x + j).get(y + (analyzeField.size() - i - 1)))) {
                 	return false;
                 }
             }
@@ -361,7 +366,8 @@ public class LabAnalyzer {
         for (int j = 0; j <= field.get(0).size() - analyzeField.get(0).size(); j++) {
             for (int i = 0; i <= field.size() - analyzeField.size(); i++) {
                 if (equalsPartsOfFieldsOverRotated(field, i, j)) {
-                    potentialCor.add(new int[]{i + (analyzeField.size() - corNow[0] - 1), j + (analyzeField.get(0).size() - corNow[1] - 1), 180});
+                    potentialCor.add(new int[]{i + (analyzeField.size() - corNow[0] - 1), j +
+                            (analyzeField.get(0).size() - corNow[1] - 1), 180});
                 }
             }
         }
@@ -371,7 +377,9 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsOverRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
-                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsOverRotated(field.get(x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))) {
+                if (analyzeField.get(i).get(j) != null &&
+                        !analyzeField.get(i).get(j).equalsOverRotated(field.get
+                                (x + (analyzeField.size() - i - 1)).get(y + (analyzeField.get(0).size() - j - 1)))) {
                     return false;
                 }
             }
@@ -396,7 +404,9 @@ public class LabAnalyzer {
     private static boolean equalsPartsOfFieldsLeftRotated(ArrayList<ArrayList<LabItem>> field, int x, int y) {
         for (int i = 0; i < analyzeField.size(); i++) {
             for (int j = 0; j < analyzeField.get(0).size(); j++) {
-                if (analyzeField.get(i).get(j) != null && !analyzeField.get(i).get(j).equalsLeftRotated(field.get(x + analyzeField.get(0).size() - j - 1).get(y + i))) {
+                if (analyzeField.get(i).get(j) != null &&
+                        !analyzeField.get(i).get(j).equalsLeftRotated(field.get
+                                (x + analyzeField.get(0).size() - j - 1).get(y + i))) {
                     return false;
                 }
             }
@@ -440,7 +450,81 @@ public class LabAnalyzer {
     	}
     	return analyzeField.get(corNow[0]).get(corNow[1] - 1).wasRobotHere;
     }
-    
+
+    public static int countUnknownCheckForward()
+    {
+        int _count = 0;
+        if(corNow[1] == analyzeField.get(corNow[0]).size() - 1)
+        {
+            return 0;
+        }
+        int _yCorNowItem = corNow[1] + 1;
+        while(_yCorNowItem != analyzeField.get(corNow[0]).size()
+                && analyzeField.get(corNow[0]).get(_yCorNowItem).wasRobotHere)
+        {
+            _count++;
+            _yCorNowItem++;
+        }
+
+        return _count;
+    }
+
+    public static int countUnknownCheckRight()
+    {
+        int _count = 0;
+        if(corNow[0] == analyzeField.size() - 1)
+        {
+            return 0;
+        }
+        int _xCorNowItem = corNow[0] + 1;
+        while(_xCorNowItem != analyzeField.size()
+                && analyzeField.get(_xCorNowItem).get(corNow[1]).wasRobotHere)
+        {
+            _count++;
+            _xCorNowItem++;
+        }
+
+        return _count;
+    }
+
+    public static int countUnknownCheckLeft()
+    {
+        int _count = 0;
+        if(corNow[0] == 0)
+        {
+            return 0;
+        }
+        int _xCorNowItem = corNow[0] - 1;
+        while(_xCorNowItem != -1
+                && analyzeField.get(_xCorNowItem).get(corNow[1]).wasRobotHere)
+        {
+            _count++;
+            _xCorNowItem--;
+        }
+
+        return _count;
+    }
+
+    public static int countUnknownCheckBack()
+    {
+        int _count = 0;
+        if(corNow[1] == 0)
+        {
+            return 0;
+        }
+        int _yCorNowItem = corNow[1] - 1;
+        while(_yCorNowItem != -1
+                && analyzeField.get(corNow[0]).get(_yCorNowItem).wasRobotHere)
+        {
+            _count++;
+            _yCorNowItem--;
+        }
+
+
+        return _count;
+
+    }
+
     /**
      * Метод {@code outField} выводит просканируемый лабиринт
      */

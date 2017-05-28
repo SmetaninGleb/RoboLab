@@ -1,7 +1,5 @@
 package ru.li24robotics.ev3.robolab.robotControl;
 
-import java.util.Date;
-
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -12,7 +10,8 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 import lejos.utility.Delay;
-import lejos.utility.Timer;
+
+import javax.print.attribute.standard.PDLOverrideSupported;
 
 
 public class RobotController implements IRobotController {
@@ -50,10 +49,12 @@ public class RobotController implements IRobotController {
 	private final float FORWARD_COLIBRATE_VALUE = 0.05f;
 	private final float PERFECT_SIDE_COLIBRATION_DISTACE = 0.06f;
 	private final float CHECK_NEAR_WALL_DISTANCE = 0.13f;
-	private final float P_REGULATOR_ROTATION_COEF = 12f;
-	private final float D_REGULATOR_ROTATION_COEF = 35f;
-	private final float P_REGULATOR_MOVE_COEF = 0f; // TODO настроить!!!
-	private final float D_REGULATOR_MOVE_COEF = 0f; // TODO настроить!!!
+	private final float P_REGULATOR_ROTATION_90DEG_COEF = 12f;
+	private final float D_REGULATOR_ROTATION_90DEG_COEF = 35f;
+    private final float P_REGULATOR_ROTATION_180DEG_COEF = 0f; //TODO настроить!!!
+    private final float D_REGULATOR_ROTATION_180DEG_COEF = 0f; //TODO настроить!!!
+	private final float P_REGULATOR_MOVE_COEF = 0f; //TODO настроить!!!
+	private final float D_REGULATOR_MOVE_COEF = 0f; //TODO настроить!!!
 	private final long ROTATION_LEFT_RIGHT_TIME_MILLIS = 1200; // впритык - секунда(1000)
 	private final long ROTATION_BACK_TIME_MILLIS = 2400; // еще не проверялось
 	
@@ -83,79 +84,93 @@ public class RobotController implements IRobotController {
     @Override
     public void forwardForChecks(int countCheck) 
     {
-		Delay.msDelay(ERROR_DELAY);
+		// For errors with time
+        Delay.msDelay(ERROR_DELAY);
+
+        // Calculate motor's rotating
     	double _allLength = CHECK_LENGTH * (double)countCheck;
     	double _allDegrees = _allLength / WHEEL_CIRCUM * 360;
-    	motor_r.setSpeed(MAX_SPEED);
+
+        // Make ready motors for start
+        isWallBack = false;
+        motor_r.setSpeed(MAX_SPEED);
     	motor_l.setSpeed(MAX_SPEED);
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
-		motor_r.resetTachoCount();
-		motor_l.resetTachoCount();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
-//    	motor_r.rotate((int)_allDegrees, true);
-//    	motor_l.rotate((int)_allDegrees, true);
-		float [] _nowGyroSamples = new float[gyro.sampleSize()];
-		float _nowDegrees = _nowGyroSamples[0];
-		int _errorPRegulatorMove_r;
-		int _controlPRegulatorMove_r;
-		int _controlDRegulatorMove_r;
-		int _controlRegulatorMove_r;
-		int _oldDRegulatorMove_r = motor_r.getTachoCount();
-		int _errorPRegulatorMove_l;
-		int _controlPRegulatorMove_l;
-		int _controlDRegulatorMove_l;
-		int _controlRegulatorMove_l;
-		int _oldDRegulatorMove_l = motor_l.getTachoCount();
-		while (motor_l.getTachoCount() != _allDegrees || motor_r.getTachoCount() != _allDegrees || _nowDegrees != perfectRotationAngle)
-		{
-			_errorPRegulatorMove_r = (int)_allDegrees - motor_r.getTachoCount();
-			_controlPRegulatorMove_r = (int)(_errorPRegulatorMove_r * P_REGULATOR_MOVE_COEF);
-			_controlDRegulatorMove_r = (int)((motor_r.getTachoCount() - _oldDRegulatorMove_r) * D_REGULATOR_MOVE_COEF);
-			_controlRegulatorMove_r = _controlDRegulatorMove_r + _controlPRegulatorMove_r;
-			motor_r.setSpeed(MAX_SPEED + _controlRegulatorMove_r);
 
-			_errorPRegulatorMove_l = (int)_allDegrees - motor_l.getTachoCount();
-			_controlPRegulatorMove_l = (int)(_errorPRegulatorMove_l * P_REGULATOR_MOVE_COEF);
-			_controlDRegulatorMove_l = (int)((motor_l.getTachoCount() - _oldDRegulatorMove_l) * D_REGULATOR_MOVE_COEF);
-			_controlRegulatorMove_l = _controlDRegulatorMove_l + _controlPRegulatorMove_l;
-			motor_l.setSpeed(MAX_SPEED + _controlRegulatorMove_l);
-		}
+        // Init regulator's variables
+        float [] _nowGyroSamples = new float[gyro.sampleSize()];
+        gyro.fetchSample(_nowGyroSamples, 0);
+        float _nowDegrees = _nowGyroSamples[0];
+        int _errorRotation;
+        int _controlRotationPRegulator;
+        int _controlRotationDRegulator;
+        int _controlRegulatorSum;
+        int _oldRotationDRegulator = (int)_nowDegrees;
+
+        // Start motors
+    	motor_r.rotate((int)_allDegrees, true);
+    	motor_l.rotate((int)_allDegrees, true);
+
+        // Start regulating
+        while(motor_r.isMoving() || motor_l.isMoving())
+        {
+            gyro.fetchSample(_nowGyroSamples, 0);
+            _nowDegrees = _nowGyroSamples[0];
+            _errorRotation = (int)(perfectRotationAngle - _nowDegrees);
+            _controlRotationPRegulator = (int)(_errorRotation * P_REGULATOR_MOVE_COEF);
+            _controlRotationDRegulator = (int)((_nowDegrees - _oldRotationDRegulator) * D_REGULATOR_MOVE_COEF);
+            _controlRegulatorSum = _controlRotationDRegulator + _controlRotationPRegulator;
+            motor_r.setSpeed(MAX_SPEED + _controlRegulatorSum);
+            motor_l.setSpeed(MAX_SPEED - _controlRegulatorSum);
+        }
+
+        // Make motors standart state
     	motor_r.waitComplete();
     	motor_l.waitComplete();
-    	isWallBack = false;
-//    	colibrateDistance();
     }
     
     @Override
-    public void backForChecks(int countCheck) {
+    public void backForChecks(int countCheck)
+    {
     	
     }
 
     @Override
-    public void turnRight() {
+    public void turnRight()
+    {
+        // For errors with time
     	Delay.msDelay(ERROR_DELAY);
+
+        // Do field's changes
     	isWallBack = isWallNearLeft();
 		perfectRotationAngle -= TO_RIGHT_DEGREES;
+
+        // Make ready motors for start
+        motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
+        motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
+
+        // Init variables for rotating and regulating
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
-    	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
     	int _oldDRegulator = _nowDegrees;
     	long _startRotateTime_millis = System.currentTimeMillis();
     	long _nowRotateTime_millis = _startRotateTime_millis;
 		int _errorPRegulator;
 		int _controlPRegulator;
 		int _controlDRegulator;
+
+        // Start rotating with regulators
     	while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_LEFT_RIGHT_TIME_MILLIS)
     	{
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
     		_errorPRegulator = perfectRotationAngle - _nowDegrees;
-    		_controlPRegulator = (int)(_errorPRegulator * P_REGULATOR_ROTATION_COEF);
-    		_controlDRegulator = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_COEF));
+    		_controlPRegulator = (int)(_errorPRegulator * P_REGULATOR_ROTATION_90DEG_COEF);
+    		_controlDRegulator = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_90DEG_COEF));
     		motor_l.setSpeed(Math.abs(_controlPRegulator + _controlDRegulator));
     		motor_r.setSpeed(Math.abs(_controlPRegulator + _controlDRegulator));
     		if(_controlPRegulator + _controlDRegulator < 0)
@@ -170,38 +185,52 @@ public class RobotController implements IRobotController {
     		_oldDRegulator = _nowDegrees;
     		_nowRotateTime_millis = System.currentTimeMillis();
     	}
+
+    	// To standart states
     	motor_r.stop(true);
     	motor_l.stop(true);
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
-    	colibrateRotate();
+
+        // Start colibration
+        colibrateRotate();
     }
 
     @Override
-    public void turnLeft() {
+    public void turnLeft()
+    {
+        // For errors with time
     	Delay.msDelay(ERROR_DELAY);
+
+        // Do field's changes
     	isWallBack = isWallNearRight();
 		perfectRotationAngle -= TO_LEFT_DEGREES;
-    	float[] _nowSample = new float[gyro.sampleSize()];
+
+        // Make ready motors for start
+        motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
+        motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
+
+        // Init variables for rotating and regulating
+        float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
-    	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
     	int _oldDRegulator = _nowDegrees;
     	long _startRotateTime_millis = System.currentTimeMillis();
     	long _nowRotateTime_millis = _startRotateTime_millis;
 		int _errorPRegulator;
 		int _controlPRegulator;
 		int _controlDRegulator;
-		while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_LEFT_RIGHT_TIME_MILLIS)
+
+        // Start rotating with regulators
+        while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_LEFT_RIGHT_TIME_MILLIS)
     	{
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
     		_errorPRegulator = perfectRotationAngle - _nowDegrees;
-    		_controlPRegulator = (int)(_errorPRegulator * P_REGULATOR_ROTATION_COEF);
-    		_controlDRegulator = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_COEF));
+    		_controlPRegulator = (int)(_errorPRegulator * P_REGULATOR_ROTATION_90DEG_COEF);
+    		_controlDRegulator = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_90DEG_COEF));
     		motor_l.setSpeed(Math.abs(_controlPRegulator + _controlDRegulator));
     		motor_r.setSpeed(Math.abs(_controlPRegulator + _controlDRegulator));
     		if(_controlPRegulator + _controlDRegulator < 0)
@@ -216,38 +245,52 @@ public class RobotController implements IRobotController {
     		_oldDRegulator = _nowDegrees;
     		_nowRotateTime_millis = System.currentTimeMillis();
     	}
+
+        // To standart states
     	motor_r.stop(true);
     	motor_l.stop(true);
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
+
+        // Start colibration
     	colibrateRotate();
     }
 
     @Override
-    public void turnBack() {
-    	Delay.msDelay(ERROR_DELAY);
-    	isWallBack = isWallNearForward();
+    public void turnBack()
+    {
+        // For errors with time
+        Delay.msDelay(ERROR_DELAY);
+
+        // Do field's changes
+        isWallBack = isWallNearForward();
 		perfectRotationAngle -= TO_BACK_DEGREES;
+
+        // Make ready motors for start
+        motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
+        motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
+
+        // Init variables for rotating and regulating
     	float[] _nowSample = new float[gyro.sampleSize()];
     	gyro.fetchSample(_nowSample, 0);
     	int _nowDegrees = (int)_nowSample[0];
-    	motor_l.setAcceleration(MAX_ROTATE_ACCELERATION);
-    	motor_r.setAcceleration(MAX_ROTATE_ACCELERATION);
     	int _oldDRegulator = _nowDegrees;
     	long _startRotateTime_millis = System.currentTimeMillis();
     	long _nowRotateTime_millis = _startRotateTime_millis;
 		int _errorPRegulator;
 		int _controlPRegulator;
 		int _controlDRegulator;
-    	while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_BACK_TIME_MILLIS)
+
+        // Start rotating with regulators
+        while(_nowRotateTime_millis - _startRotateTime_millis < ROTATION_BACK_TIME_MILLIS)
     	{
     		gyro.fetchSample(_nowSample, 0);
     		_nowDegrees = (int)_nowSample[0];
     		_errorPRegulator = perfectRotationAngle - _nowDegrees;
-    		_controlPRegulator = (int)(_errorPRegulator * P_REGULATOR_ROTATION_COEF);
-    		_controlDRegulator = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_COEF));
+    		_controlPRegulator = (int)(_errorPRegulator * P_REGULATOR_ROTATION_180DEG_COEF);
+    		_controlDRegulator = (int)((_nowDegrees - _oldDRegulator) * (D_REGULATOR_ROTATION_180DEG_COEF));
     		motor_l.setSpeed(Math.abs(_controlPRegulator + _controlDRegulator));
     		motor_r.setSpeed(Math.abs(_controlPRegulator + _controlDRegulator));
     		if(_controlPRegulator + _controlDRegulator < 0)
@@ -262,12 +305,16 @@ public class RobotController implements IRobotController {
     		_oldDRegulator = _nowDegrees;
     		_nowRotateTime_millis = System.currentTimeMillis();
     	}
+
+        // To standart states
     	motor_r.stop(true);
     	motor_l.stop(true);
     	motor_r.waitComplete();
     	motor_l.waitComplete();
     	motor_r.setAcceleration(ACCELERATION);
     	motor_l.setAcceleration(ACCELERATION);
+
+        // Start colibration
     	colibrateRotate();
     }
     
@@ -283,34 +330,20 @@ public class RobotController implements IRobotController {
         	Delay.msDelay(ERROR_DELAY);
         	motor_r.waitComplete();
         	motor_l.waitComplete();
-//    		motor_r.startSynchronization();
     		motor_r.backward();
     		motor_l.backward();
-//    		motor_r.endSynchronization();
     		Delay.msDelay(DELAY_COLIBRATE_ROTATE);
-//    		motor_r.startSynchronization();
     		motor_r.stop(true);
     		motor_l.stop(true);
-//    		motor_r.endSynchronization();
     		motor_r.waitComplete();
         	motor_l.waitComplete();
     		((EV3GyroSensor)gyroSensor).reset();
     		perfectRotationAngle = 0;
-//    		
-//    		motor_r.setSpeed(MAX_SPEED);
-//    		motor_l.setSpeed(MAX_SPEED);
-//    		motor_r.startSynchronization();
     		motor_r.rotate(COLIBRATE_ROTATE_FORWARD_DEGREES, true);
     		motor_l.rotate(COLIBRATE_ROTATE_FORWARD_DEGREES, true);
-//    		motor_r.endSynchronization();
     		motor_r.waitComplete();
         	motor_l.waitComplete();
-       
-//    		motor_r.setSpeed(0);
-//    		motor_l.setSpeed(0);
-    		
     	}
-    	colibrateDistance();
     }
     
     private void colibrateDistance()
@@ -408,11 +441,9 @@ public class RobotController implements IRobotController {
     	if((_nowSample_r[0] < MIN_VALUE_SIDE_COLIBRATE && isWallNearRight()) || 
     			(isWallNearLeft() && _nowSample_l[0] > 2 * PERFECT_SIDE_COLIBRATION_DISTACE -  MIN_VALUE_SIDE_COLIBRATE))
     	{
-    		_nowSample_r = null;
     		return true;
     	}
     	else {
-    		_nowSample_r = null;
     		return false;
     	}
     }
@@ -433,11 +464,9 @@ public class RobotController implements IRobotController {
     	if((_nowSample_l[0] < MIN_VALUE_SIDE_COLIBRATE && isWallNearLeft()) || 
     			(isWallNearRight() && _nowSample_r[0] > 2 * PERFECT_SIDE_COLIBRATION_DISTACE -  MIN_VALUE_SIDE_COLIBRATE))
     	{
-    		_nowSample_l = null;
     		return true;
     	}
     	else {
-    		_nowSample_l = null;
     		return false;
     	}
     }
@@ -452,14 +481,10 @@ public class RobotController implements IRobotController {
     	motor_l.waitComplete();
     	int _backToStart = COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE;
     	Delay.msDelay(ERROR_DELAY);
-//    	motor_r.startSynchronization();
     	motor_r.rotate(_backToStart, true);
     	motor_l.rotate(_backToStart, true);
-//    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
-//    	motor_r.setSpeed(0);
-//    	motor_l.setSpeed(0);
     	
     }
     
@@ -472,19 +497,66 @@ public class RobotController implements IRobotController {
     	motor_r.rotate(COLIBRATE_DISTANCE_ROTATION_ANGLE, true);
     	motor_r.waitComplete();
     	int _backToStart = COLIBRATE_DISTANCE_ROTATION_BACK_ANGLE;
-//    	motor_r.startSynchronization();
     	motor_r.rotate(_backToStart, true);
     	motor_l.rotate(_backToStart, true);
-//    	motor_r.endSynchronization();
     	motor_r.waitComplete();
     	motor_l.waitComplete();
-//    	motor_r.setSpeed(0);
-//    	motor_l.setSpeed(0);
     }
     
     @Override
-    public void forwardToWall() {
+    public void forwardToWall()
+    {
+        // For errors with time
+        Delay.msDelay(ERROR_DELAY);
 
+        // Make ready motors for start
+        isWallBack = false;
+        motor_r.setSpeed(MAX_SPEED);
+        motor_l.setSpeed(MAX_SPEED);
+        motor_r.setAcceleration(ACCELERATION);
+        motor_l.setAcceleration(ACCELERATION);
+        motor_r.waitComplete();
+        motor_l.waitComplete();
+
+        // Init regulator's variables
+        float [] _nowGyroSamples = new float[gyro.sampleSize()];
+        gyro.fetchSample(_nowGyroSamples, 0);
+        float _nowDegrees = _nowGyroSamples[0];
+        int _errorRotation;
+        int _controlRotationPRegulator;
+        int _controlRotationDRegulator;
+        int _controlRegulatorSum;
+        int _oldRotationDRegulator = (int)_nowDegrees;
+
+        // Start motors
+        motor_r.forward();
+        motor_l.forward();
+
+        // Start regulating
+        while(motor_r.isMoving() || motor_l.isMoving())
+        {
+            gyro.fetchSample(_nowGyroSamples, 0);
+            _nowDegrees = _nowGyroSamples[0];
+            _errorRotation = (int)(perfectRotationAngle - _nowDegrees);
+            _controlRotationPRegulator = (int)(_errorRotation * P_REGULATOR_MOVE_COEF);
+            _controlRotationDRegulator = (int)((_nowDegrees - _oldRotationDRegulator) * D_REGULATOR_MOVE_COEF);
+            _controlRegulatorSum = _controlRotationDRegulator + _controlRotationPRegulator;
+            motor_r.setSpeed(MAX_SPEED + _controlRegulatorSum);
+            motor_l.setSpeed(MAX_SPEED - _controlRegulatorSum);
+
+            // Stop moving
+            if(isWallNearForward())
+            {
+                motor_r.stop(true);
+                motor_l.stop(true);
+            }
+        }
+
+        // Make motors standart state
+        motor_r.waitComplete();
+        motor_l.waitComplete();
+        motor_r.setSpeed(MAX_SPEED);
+        motor_l.setSpeed(MAX_SPEED);
     }
 
     @Override
@@ -493,7 +565,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public boolean isWallNearLeft() {
+    public boolean isWallNearLeft()
+    {
     	float _distance;
     	float[] _nowSample = new float[sonic_l.sampleSize()];
     	sonic_l.fetchSample(_nowSample, 0);
@@ -502,7 +575,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public boolean isWallNearForward() {
+    public boolean isWallNearForward()
+    {
     	float _distance;
     	float[] _nowSample = new float[sonic_f.sampleSize()];
     	sonic_f.fetchSample(_nowSample, 0);
@@ -511,7 +585,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public boolean isWallNearRight() {
+    public boolean isWallNearRight()
+    {
     	float _distance;
     	float[] _nowSample = new float[sonic_r.sampleSize()];
     	sonic_r.fetchSample(_nowSample, 0);
@@ -525,7 +600,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public int checksCountToWallAtLeft() {
+    public int checksCountToWallAtLeft()
+    {
         int _count;
         double _distance;
         float[] _sample = new float[sonic_l.sampleSize()];
@@ -536,7 +612,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public int checksCountToWallAtRight() {
+    public int checksCountToWallAtRight()
+    {
     	int _count;
         double _distance;
         float[] _sample = new float[sonic_r.sampleSize()];
@@ -547,7 +624,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public int checksCountToWallAtBack() {
+    public int checksCountToWallAtBack()
+    {
         int _count;
         turnRight();
         _count = checksCountToWallAtRight();
@@ -556,7 +634,8 @@ public class RobotController implements IRobotController {
     }
 
     @Override
-    public int checksCountToWallAtForward() {
+    public int checksCountToWallAtForward()
+    {
     	int _count;
         double _distance;
         float[] _sample = new float[sonic_f.sampleSize()];
@@ -564,6 +643,18 @@ public class RobotController implements IRobotController {
         _distance = (double)_sample[0];
         _count = (int)(_distance / CHECK_LENGTH);
     	return _count;
+    }
+
+    public void resetMoveCount()
+    {
+        motor_r.resetTachoCount();
+        motor_l.resetTachoCount();
+    }
+
+    public int getCheckMoved()
+    {
+        double _count = motor_r.getTachoCount() /  CHECK_LENGTH;
+        return (int)_count;
     }
 
     public void showStatus()
