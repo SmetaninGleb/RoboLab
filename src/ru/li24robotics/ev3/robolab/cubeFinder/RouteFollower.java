@@ -57,7 +57,8 @@ public class RouteFollower
 		for(int i = 0; i < mainRoute.getRouteSize(); i++)
 		{
 			//System.out.println(robotRotation_degrees);
-			//System.out.println(_nowRouteList.get(i).getType());
+			System.out.println(_nowRouteList.get(i).getType());
+			System.out.println(_nowRouteList.get(i).getValue());
 			if(_nowRouteList.get(i).getType().equals("ToRight"))
 			{
 				toRight((int)_nowRouteList.get(i).getValue());

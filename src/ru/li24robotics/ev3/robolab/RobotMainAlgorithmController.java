@@ -24,23 +24,25 @@ public class RobotMainAlgorithmController
     public static void main(String args[])
     {
         Initialization();        
-        for (int i = 0; i < 10; i--)
-        {
-        	robotController.turnBack();
-        }
-//        while(!Button.ENTER.isDown())
+//        for (int i = 0; i < 10; i--)
 //        {
-//            LCD.clear();
-//            robotController.showStatus();
-//            Delay.msDelay(200);
+//        	robotController.turnRight();
+//        	robotController.turnLeft();
 //        }
-//        LCD.clear();
+        while(!Button.ENTER.isDown())
+        {
+            LCD.clear();
+            robotController.showStatus();
+            Delay.msDelay(200);
+        }
+        LCD.clear();
 //        analyzedCoordinates = labAnalyzeController.Analyze();
 //        LCD.drawString("ANALYZED!!!" , 0, 0);
 //        LCD.drawString(analyzedCoordinates[0] + " " + analyzedCoordinates[1] + " " + analyzedCoordinates[2], 0, 1);
-//        routeFollower.setMainRoute(RouteFileParser.getRouteFromStartCors(analyzedCoordinates));
-//        routeFollower.setStartRobotRotation_degrees(analyzedCoordinates[2]);
-//        routeFollower.followRoute();
+        analyzedCoordinates = new int[] {0, 0, 0};
+        routeFollower.setMainRoute(RouteFileParser.getRouteFromStartCors(analyzedCoordinates));
+        routeFollower.setStartRobotRotation_degrees(analyzedCoordinates[2]);
+        routeFollower.followRoute();
     }
 
     private static void Initialization()

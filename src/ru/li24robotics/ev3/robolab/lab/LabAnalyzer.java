@@ -524,6 +524,7 @@ public class LabAnalyzer {
         return _count;
 
     }
+    
 
     /**
      * Метод {@code outField} выводит просканируемый лабиринт

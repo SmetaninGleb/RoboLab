@@ -23,5 +23,15 @@ public class RouteIteration implements Serializable {
     {
         return value;
     }
+    
+    public void setType(String type)
+    {
+    	this.type = type;
+    }
+    
+    public void setValue(double value)
+    {
+    	this.value = value;
+    }
 
 }
